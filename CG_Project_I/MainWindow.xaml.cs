@@ -83,37 +83,62 @@ namespace CG_Project_I
 
         private void InversionButtonClick(object sender, RoutedEventArgs e)
         {
-            System.Drawing.Bitmap tmp = this.convertToBitmap(resultImage.Source);
-            this.functionalFilters.inversion(tmp);
-            resultImage.Source = (ImageSource)this.ImageSourceFromBitmap(tmp);
+            if (resultImage.Source != null)
+            {
+                System.Drawing.Bitmap tmp = this.convertToBitmap(resultImage.Source);
+                this.functionalFilters.inversion(tmp);
+                resultImage.Source = (ImageSource)this.ImageSourceFromBitmap(tmp);
+            }
+            else
+                MessageBox.Show("Please load an image","No Image loaded");
         }
 
         private void BrightnessButtonClick(object sender, RoutedEventArgs e)
         {
-            System.Drawing.Bitmap tmp = this.convertToBitmap(resultImage.Source);
-            this.functionalFilters.brightness(tmp, brightnessStep);
-            resultImage.Source = (ImageSource)this.ImageSourceFromBitmap(tmp);
+            if (resultImage.Source != null)
+            {
+                System.Drawing.Bitmap tmp = this.convertToBitmap(resultImage.Source);
+                this.functionalFilters.brightness(tmp, brightnessStep);
+                resultImage.Source = (ImageSource)this.ImageSourceFromBitmap(tmp);
+            }
+            else
+                MessageBox.Show("Please load an image", "No Image loaded");
         }
 
         private void ContrastButtonClick(object sender, RoutedEventArgs e)
         {
-            System.Drawing.Bitmap tmp = this.convertToBitmap(resultImage.Source);
-            this.functionalFilters.contrast(tmp, contrastStep);
-            resultImage.Source = (ImageSource)this.ImageSourceFromBitmap(tmp);
+            if (resultImage.Source != null)
+            {
+                System.Drawing.Bitmap tmp = this.convertToBitmap(resultImage.Source);
+                this.functionalFilters.contrast(tmp, contrastStep);
+                resultImage.Source = (ImageSource)this.ImageSourceFromBitmap(tmp);
+            }
+            else
+                MessageBox.Show("Please load an image", "No Image loaded");
         }
 
         private void GammaButtonClick(object sender, RoutedEventArgs e)
         {
-            System.Drawing.Bitmap tmp = this.convertToBitmap(resultImage.Source);
-            this.functionalFilters.gamma(tmp, gammaStep);
-            resultImage.Source = (ImageSource)this.ImageSourceFromBitmap(tmp);
+            if (resultImage.Source != null)
+            {
+                System.Drawing.Bitmap tmp = this.convertToBitmap(resultImage.Source);
+                this.functionalFilters.gamma(tmp, gammaStep);
+                resultImage.Source = (ImageSource)this.ImageSourceFromBitmap(tmp);
+            }
+            else
+                MessageBox.Show("Please load an image", "No Image loaded");
         }
 
         private void BlurButtonClick(object sender, RoutedEventArgs e)
         {
-            System.Drawing.Bitmap tmp = this.convertToBitmap(resultImage.Source);
-            this.convolutionFilters.blur(tmp);
-            resultImage.Source = this.ImageSourceFromBitmap(tmp);
+            if (resultImage.Source != null)
+            {
+                System.Drawing.Bitmap tmp = this.convertToBitmap(resultImage.Source);
+                //this.convolutionFilters.blur(tmp);
+                resultImage.Source = this.ImageSourceFromBitmap(tmp);
+            }
+            else
+                MessageBox.Show("Please load an image", "No Image loaded");
         }
 
         private System.Drawing.Bitmap convertToBitmap(ImageSource bitmapSource)

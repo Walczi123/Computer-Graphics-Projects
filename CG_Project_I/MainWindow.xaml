@@ -49,13 +49,13 @@
             <DockPanel Grid.Column="0" Grid.Row="2">
                 <Border BorderThickness="2" BorderBrush="#FF000000" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,10,10,10">
                 <Image x:Name="orginalImage" HorizontalAlignment="Left"  VerticalAlignment="Center"  
-                   Source="D:\Git Repositories\Computer Graphics I\CG_Project_I\example.jpg"/>
+                   Source=".\example.jpg"/>
                 </Border>
             </DockPanel>
             <DockPanel Grid.Column="1" Grid.Row="2">
                 <Border BorderThickness="2" BorderBrush="#FF000000" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,10,10,10">
                 <Image x:Name="resultImage" HorizontalAlignment="Left"  VerticalAlignment="Center"  
-                   Source="D:\Git Repositories\Computer Graphics I\CG_Project_I\example.jpg"/>
+                   Source=".\example.jpg"/>
                 </Border>
             </DockPanel>
             <DockPanel Grid.Column="0" Grid.Row="4" >
@@ -85,10 +85,10 @@
             <Button Content="Contrast Enhancement" HorizontalAlignment="Center"  Grid.Row="3" VerticalAlignment="Center" Width="140" Click="ContrastButtonClick"/>
             <Button Content="Gamma Correction" HorizontalAlignment="Center"  Grid.Row="4" VerticalAlignment="Center" Width="140" Click="GammaButtonClick"/>
             <TextBlock HorizontalAlignment="Center" Text="Convolution Filters" VerticalAlignment="Center" Grid.Row="5"/>
-            <Button Content="Blur" HorizontalAlignment="Center"  Grid.Row="6" VerticalAlignment="Center" Width="140" Click="BlurButtonClick"/>
-            <Button Content="Brightness Correction" HorizontalAlignment="Center"  Grid.Row="7" VerticalAlignment="Center" Width="140" Click="BrightnessButtonClick"/>
-            <Button Content="Contrast Enhancement" HorizontalAlignment="Center"  Grid.Row="8" VerticalAlignment="Center" Width="140" Click="ContrastButtonClick"/>
-            <Button Content="Gamma Correction" HorizontalAlignment="Center"  Grid.Row="9" VerticalAlignment="Center" Width="140" Click="GammaButtonClick"/>
+            <Button Content="Blur" HorizontalAlignment="Center"  Grid.Row="6" VerticalAlignment="Center" Width="140" Click="BlurButtonClick" IsEnabled="False"/>
+            <Button Content="Brightness Correction" HorizontalAlignment="Center"  Grid.Row="7" VerticalAlignment="Center" Width="140" Click="BrightnessButtonClick" IsEnabled="False"/>
+            <Button Content="Contrast Enhancement" HorizontalAlignment="Center"  Grid.Row="8" VerticalAlignment="Center" Width="140" Click="ContrastButtonClick" IsEnabled="False"/>
+            <Button Content="Gamma Correction" HorizontalAlignment="Center"  Grid.Row="9" VerticalAlignment="Center" Width="140" Click="GammaButtonClick" IsEnabled="False"/>
 
         </Grid>
         
