@@ -19,8 +19,8 @@ namespace CG_Project_I
     {
         private FunctionalFilters functionalFilters = new FunctionalFilters();
         private ConvolutionFilters convolutionFilters = new ConvolutionFilters();
-        private int brightnessStep = 20;
-        private double contrastStep = 5;
+        private int brightnessStep = 50;
+        private double contrastStep = 1.3;
         private double gammaStep = 1.3;
         public MainWindow()
         {
@@ -134,8 +134,9 @@ namespace CG_Project_I
             if (resultImage.Source != null)
             {
                 System.Drawing.Bitmap tmp = this.convertToBitmap(resultImage.Source);
-                //this.convolutionFilters.blur(tmp);
-                resultImage.Source = this.ImageSourceFromBitmap(tmp);
+                this.convolutionFilters.blur(tmp,3);
+                resultImage.Source = (ImageSource)this.ImageSourceFromBitmap(tmp);
+                MessageBox.Show("Done", "blurred");
             }
             else
                 MessageBox.Show("Please load an image", "No Image loaded");

@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CG_Project_I"
         mc:Ignorable="d"
-        Title="Computer Grapihcs Project I" Height="450" Width="800"
-        MinHeight="320" MinWidth="420">
+        Title="Computer Grapihcs Project I" Height="800" Width="800"
+        MinHeight="500" MinWidth="550">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -14,6 +14,8 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="25" />
+            <RowDefinition Height="*" MinHeight="345"/>
+            <RowDefinition Height="5" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0" Grid.ColumnSpan="2">
@@ -39,7 +41,7 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            
+
             <DockPanel Grid.Column="0" Grid.Row="1">
                 <TextBlock Text="Orginal" HorizontalAlignment="Center"  VerticalAlignment="Center"/>
             </DockPanel>
@@ -48,13 +50,13 @@
             </DockPanel>
             <DockPanel Grid.Column="0" Grid.Row="2">
                 <Border BorderThickness="2" BorderBrush="#FF000000" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,10,10,10">
-                <Image x:Name="orginalImage" HorizontalAlignment="Left"  VerticalAlignment="Center"  
+                    <Image x:Name="orginalImage" HorizontalAlignment="Left"  VerticalAlignment="Center"  
                    Source=".\example.jpg"/>
                 </Border>
             </DockPanel>
             <DockPanel Grid.Column="1" Grid.Row="2">
                 <Border BorderThickness="2" BorderBrush="#FF000000" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,10,10,10">
-                <Image x:Name="resultImage" HorizontalAlignment="Left"  VerticalAlignment="Center"  
+                    <Image x:Name="resultImage" HorizontalAlignment="Left"  VerticalAlignment="Center"  
                    Source=".\example.jpg"/>
                 </Border>
             </DockPanel>
@@ -85,12 +87,24 @@
             <Button Content="Contrast Enhancement" HorizontalAlignment="Center"  Grid.Row="3" VerticalAlignment="Center" Width="140" Click="ContrastButtonClick"/>
             <Button Content="Gamma Correction" HorizontalAlignment="Center"  Grid.Row="4" VerticalAlignment="Center" Width="140" Click="GammaButtonClick"/>
             <TextBlock HorizontalAlignment="Center" Text="Convolution Filters" VerticalAlignment="Center" Grid.Row="5"/>
-            <Button Content="Blur" HorizontalAlignment="Center"  Grid.Row="6" VerticalAlignment="Center" Width="140" Click="BlurButtonClick" IsEnabled="False"/>
+            <Button Content="Blur" HorizontalAlignment="Center"  Grid.Row="6" VerticalAlignment="Center" Width="140" Click="BlurButtonClick"/>
             <Button Content="Brightness Correction" HorizontalAlignment="Center"  Grid.Row="7" VerticalAlignment="Center" Width="140" Click="BrightnessButtonClick" IsEnabled="False"/>
             <Button Content="Contrast Enhancement" HorizontalAlignment="Center"  Grid.Row="8" VerticalAlignment="Center" Width="140" Click="ContrastButtonClick" IsEnabled="False"/>
             <Button Content="Gamma Correction" HorizontalAlignment="Center"  Grid.Row="9" VerticalAlignment="Center" Width="140" Click="GammaButtonClick" IsEnabled="False"/>
 
         </Grid>
-        
+        <GridSplitter Grid.Row="2" Height="5" HorizontalAlignment="Stretch" Grid.ColumnSpan="2"/>
+        <Grid Grid.Row="3" Grid.Column="1" HorizontalAlignment="Left" Height="100" Margin="71,136,-21,0" VerticalAlignment="Top" Width="100"/>
+        <Grid Grid.Column="1" Grid.Row="3" Background="#FFBAC0C5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50" />
+                <RowDefinition Height="50" />
+                <RowDefinition Height="50" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+        </Grid>
+        <Grid  Grid.Row="3">
+        </Grid>
+
     </Grid>
 </Window>
