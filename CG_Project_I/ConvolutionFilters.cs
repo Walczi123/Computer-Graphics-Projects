@@ -10,116 +10,102 @@ namespace CG_Project_I
 {
     class ConvolutionFilters
     {
-        private double[,] kernel = { {  1, 1, 1, },
-                                    {  1, 1, 1, },
-                                    {  1, 1, 1, } };
-
         public ConvolutionFilters() { }
 
-        //public Bitmap blur(Bitmap img)
-        //{
-        //    Bitmap copy = (Bitmap) img.Clone();
-        //    int xx, yy;
-        //    int R, G, B;
-        //    int PixelCount;
-        //    Color tmp;
-        //    for (int y = 0; y < img.Height; y++)
-        //    {
-        //        for (int x = 0; x < img.Width; x++)
-        //        {
-        //            R = 0; G = 0; B = 0;
-        //            PixelCount = 0;
-        //            for ( yy = -1; yy < 2 ; yy++)
-        //            {
-        //                for ( xx = -1; xx < 2; xx++)
-        //                {
-        //                    if(yy + y >= 0 && yy + y <= img.Height && xx + x >= 0 && xx + x <= img.Width)
-        //                    {
-        //                        tmp = copy.GetPixel(x + xx, y + yy);
-        //                        PixelCount++;
-        //                        R += tmp.R;
-        //                        G += tmp.G;
-        //                        B += tmp.B;
-        //                    }
-        //                }
-        //            }
-        //            tmp = Color.FromArgb(R / PixelCount, G / PixelCount, B / PixelCount);
-        //            img.SetPixel(x, y, tmp);
-        //        }
-        //    }
-        //    return img;
-        //}
-
-        public void blur(Bitmap image, int blurSize) => image = Blur(image, new Rectangle(0, 0, image.Width, image.Height), blurSize);
-
-        private unsafe static Bitmap Blur(Bitmap image, Rectangle rectangle, Int32 blurSize)
-        {
-            Bitmap blurred = new Bitmap(image.Width, image.Height);
-
-            // make an exact copy of the bitmap provided
-            using (Graphics graphics = Graphics.FromImage(blurred))
-                graphics.DrawImage(image, new Rectangle(0, 0, image.Width, image.Height),
-                    new Rectangle(0, 0, image.Width, image.Height), GraphicsUnit.Pixel);
-
-            // Lock the bitmap's bits
-            BitmapData blurredData = blurred.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadWrite, blurred.PixelFormat);
-
-            // Get bits per pixel for current PixelFormat
-            int bitsPerPixel = Image.GetPixelFormatSize(blurred.PixelFormat);
-
-            // Get pointer to first line
-            byte* scan0 = (byte*)blurredData.Scan0.ToPointer();
-
-            // look at every pixel in the blur rectangle
-            for (int xx = rectangle.X; xx < rectangle.X + rectangle.Width; xx++)
+        public unsafe void ConvolutionFunction(Bitmap bmp, int[,] kernel)
+        {        
+            Bitmap clone = new Bitmap(bmp.Width, bmp.Height);
+            using (Graphics graphics = Graphics.FromImage(clone))
+                graphics.DrawImage(bmp, new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height),
+                    new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height), GraphicsUnit.Pixel);
+            BitmapData cloneData = clone.LockBits(
+                new Rectangle(0, 0, clone.Width, clone.Height), ImageLockMode.ReadWrite, clone.PixelFormat);
+            byte* clone0 = (byte*)cloneData.Scan0.ToPointer();
+            BitmapData bData = bmp.LockBits(
+                new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadWrite, bmp.PixelFormat);
+            byte* scan0 = (byte*)bData.Scan0.ToPointer();
+            byte bitsPerPixel = (byte)(Image.GetPixelFormatSize(bData.PixelFormat));
+            int kernelLen = kernel.GetLength(0);
+            int kernelStep = kernelLen / 2;
+            int red, green, blue, pixelCounter;        
+            for (int i = 0; i < bData.Height; i++)
             {
-                for (int yy = rectangle.Y; yy < rectangle.Y + rectangle.Height; yy++)
+                for (int j = 0; j < bData.Width; j++)
                 {
-                    int avgR = 0, avgG = 0, avgB = 0;
-                    int blurPixelCount = 0;
-
-                    // average the color of the red, green and blue for each pixel in the
-                    // blur size while making sure you don't go outside the image bounds
-                    for (int x = xx; (x < xx + blurSize && x < image.Width); x++)
+                    byte* data = scan0 + i * bData.Stride + j * bitsPerPixel / 8;
+                    red = 0;
+                    green = 0;
+                    blue = 0;
+                    pixelCounter = 0;
+                    for (int x = 0; x < kernelLen; x++)
                     {
-                        for (int y = yy; (y < yy + blurSize && y < image.Height); y++)
-                        {
-                            // Get pointer to RGB
-                            byte* data = scan0 + y * blurredData.Stride + x * bitsPerPixel / 8;
-
-                            avgB += data[0]; // Blue
-                            avgG += data[1]; // Green
-                            avgR += data[2]; // Red
-
-                            blurPixelCount++;
+                        for (int y = 0; y < kernelLen; y++)
+                        { 
+                            if(i - kernelStep + x >= 0 && i - kernelStep + x < bData.Height &&
+                                j - kernelStep + y >= 0 && j - kernelStep + y < bData.Width)
+                            {
+                                byte* tmp = clone0 + (i - kernelStep + x) * cloneData.Stride + (j - kernelStep + y) * bitsPerPixel / 8;
+                                red += tmp[0] * kernel[x,y];
+                                green += tmp[1] * kernel[x, y];
+                                blue += tmp[2] * kernel[x, y];
+                                pixelCounter+=kernel[x, y];
+                            }
                         }
                     }
-
-                    avgR = avgR / blurPixelCount;
-                    avgG = avgG / blurPixelCount;
-                    avgB = avgB / blurPixelCount;
-
-                    // now that we know the average for the blur size, set each pixel to that color
-                    for (int x = xx; x < xx + blurSize && x < image.Width && x < rectangle.Width; x++)
-                    {
-                        for (int y = yy; y < yy + blurSize && y < image.Height && y < rectangle.Height; y++)
-                        {
-                            // Get pointer to RGB
-                            byte* data = scan0 + y * blurredData.Stride + x * bitsPerPixel / 8;
-
-                            // Change values
-                            data[0] = (byte)avgB;
-                            data[1] = (byte)avgG;
-                            data[2] = (byte)avgR;
-                        }
-                    }
+                    if (pixelCounter == 0) pixelCounter = 1;
+                    data[0] = (byte)(red /pixelCounter);
+                    data[1] = (byte)(green / pixelCounter);
+                    data[2] = (byte)(blue / pixelCounter);
                 }
             }
+            bmp.UnlockBits(bData);
+        }
 
-            // Unlock the bits
-            blurred.UnlockBits(blurredData);
-
-            return blurred;
+        public unsafe void ConvolutionFunction(Bitmap bmp, int[,] kernel, int denominator)
+        {
+            if (denominator == 0) return;
+            Bitmap clone = new Bitmap(bmp.Width, bmp.Height);
+            using (Graphics graphics = Graphics.FromImage(clone))
+                graphics.DrawImage(bmp, new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height),
+                    new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height), GraphicsUnit.Pixel);
+            BitmapData cloneData = clone.LockBits(
+                new Rectangle(0, 0, clone.Width, clone.Height), ImageLockMode.ReadWrite, clone.PixelFormat);
+            byte* clone0 = (byte*)cloneData.Scan0.ToPointer();
+            BitmapData bData = bmp.LockBits(
+                new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadWrite, bmp.PixelFormat);
+            byte* scan0 = (byte*)bData.Scan0.ToPointer();
+            byte bitsPerPixel = (byte)(Image.GetPixelFormatSize(bData.PixelFormat));
+            int kernelLen = kernel.GetLength(0);
+            int kernelStep = kernelLen / 2;
+            int red, green, blue;
+            for (int i = 0; i < bData.Height; i++)
+            {
+                for (int j = 0; j < bData.Width; j++)
+                {
+                    byte* data = scan0 + i * bData.Stride + j * bitsPerPixel / 8;
+                    red = 0;
+                    green = 0;
+                    blue = 0;
+                    for (int x = 0; x < kernelLen; x++)
+                    {
+                        for (int y = 0; y < kernelLen; y++)
+                        {
+                            if (i - kernelStep + x >= 0 && i - kernelStep + x < bData.Height &&
+                                j - kernelStep + y >= 0 && j - kernelStep + y < bData.Width)
+                            {
+                                byte* tmp = clone0 + (i - kernelStep + x) * cloneData.Stride + (j - kernelStep + y) * bitsPerPixel / 8;
+                                red += tmp[0] * kernel[x, y];
+                                green += tmp[1] * kernel[x, y];
+                                blue += tmp[2] * kernel[x, y];
+                            }
+                        }
+                    }
+                    data[0] = (byte)(red / denominator);
+                    data[1] = (byte)(green / denominator);
+                    data[2] = (byte)(blue / denominator);
+                }
+            }
+            bmp.UnlockBits(bData);
         }
     }
 }

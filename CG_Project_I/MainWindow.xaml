@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CG_Project_I"
         mc:Ignorable="d"
-        Title="Computer Grapihcs Project I" Height="800" Width="800"
-        MinHeight="500" MinWidth="550">
+        Title="Computer Grapihcs Project I" Height="600" Width="800"
+        MinHeight="650" MinWidth="550">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -79,6 +79,7 @@
                 <RowDefinition Height="30" />
                 <RowDefinition Height="30" />
                 <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <TextBlock HorizontalAlignment="Center" Text="Funtional Filters" VerticalAlignment="Center"/>
@@ -88,22 +89,76 @@
             <Button Content="Gamma Correction" HorizontalAlignment="Center"  Grid.Row="4" VerticalAlignment="Center" Width="140" Click="GammaButtonClick"/>
             <TextBlock HorizontalAlignment="Center" Text="Convolution Filters" VerticalAlignment="Center" Grid.Row="5"/>
             <Button Content="Blur" HorizontalAlignment="Center"  Grid.Row="6" VerticalAlignment="Center" Width="140" Click="BlurButtonClick"/>
-            <Button Content="Brightness Correction" HorizontalAlignment="Center"  Grid.Row="7" VerticalAlignment="Center" Width="140" Click="BrightnessButtonClick" IsEnabled="False"/>
-            <Button Content="Contrast Enhancement" HorizontalAlignment="Center"  Grid.Row="8" VerticalAlignment="Center" Width="140" Click="ContrastButtonClick" IsEnabled="False"/>
-            <Button Content="Gamma Correction" HorizontalAlignment="Center"  Grid.Row="9" VerticalAlignment="Center" Width="140" Click="GammaButtonClick" IsEnabled="False"/>
+            <Button Content="Gaussian Blur" HorizontalAlignment="Center"  Grid.Row="7" VerticalAlignment="Center" Width="140" Click="GaussianBlurButtonClick"/>
+            <Button Content="Sharpen" HorizontalAlignment="Center"  Grid.Row="8" VerticalAlignment="Center" Width="140" Click="SharpenButtonClick"/>
+            <Button Content="Edge Detection" HorizontalAlignment="Center"  Grid.Row="9" VerticalAlignment="Center" Width="140" Click="EdgeDetectionButtonClick"/>
+            <Button Content="Emboss" HorizontalAlignment="Center"  Grid.Row="10" VerticalAlignment="Center" Width="140" Click="EmbossButtonClick"/>
 
         </Grid>
         <GridSplitter Grid.Row="2" Height="5" HorizontalAlignment="Stretch" Grid.ColumnSpan="2"/>
-        <Grid Grid.Row="3" Grid.Column="1" HorizontalAlignment="Left" Height="100" Margin="71,136,-21,0" VerticalAlignment="Top" Width="100"/>
         <Grid Grid.Column="1" Grid.Row="3" Background="#FFBAC0C5">
             <Grid.RowDefinitions>
-                <RowDefinition Height="50" />
-                <RowDefinition Height="50" />
-                <RowDefinition Height="50" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
+            <StackPanel  Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.429,-0.962">
+                <Label>Choose Kernel</Label>
+            </StackPanel>
+            <DockPanel Grid.Row="1">
+                <ComboBox HorizontalAlignment="Center" Margin="0,0,0,0" Grid.Row="1" VerticalAlignment="Center" Width="130">
+                    <!--<ComboBoxItem Name="other">Ohter</ComboBoxItem>-->
+                    <ComboBoxItem Name="blur">Blur</ComboBoxItem>
+                    <ComboBoxItem Name="gauss">Gaussian Blur</ComboBoxItem>
+                    <ComboBoxItem Name="sharpen">Sharpen</ComboBoxItem>
+                    <ComboBoxItem Name="edge">Edge Detection</ComboBoxItem>
+                    <ComboBoxItem Name="emboss">Emboss</ComboBoxItem>
+                </ComboBox>
+            </DockPanel>
+            <StackPanel  Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.429,-0.962">
+                <Label>Kernel size</Label>
+            </StackPanel>
+            <DockPanel Grid.Row="3">
+                <TextBox x:Name="KernerSizeTextBox" Text="{Binding ElementName=KernelSizeSlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"
+                         DockPanel.Dock="Right" TextAlignment="Right" Width="20"
+                         VerticalAlignment="Center" Margin="0,0,10,3"/>
+                <Slider x:Name="KernelSizeSlider"  Margin="10,0,10,0" Value="3" VerticalAlignment="Center" 
+                    AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" IsSnapToTickEnabled="True" 
+                    TickFrequency="2" Maximum="9" Minimum="3" TickPlacement="BottomRight" ValueChanged="KernelSizeSlider_ValueChanged"/>
+            </DockPanel>
+            <DockPanel Grid.Row="4" HorizontalAlignment="Center">
+                <TextBlock VerticalAlignment="Center" Width="50">Divisor</TextBlock>
+                <TextBox Name="Divisor" TextAlignment="Right" Width="20"
+                         VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <Button x:Name="ComputeDivisor" Click="ComputeDivisor_Click">Compute</Button>
+            </DockPanel>
+            <DockPanel Grid.Row="5" HorizontalAlignment="Center">
+                <TextBlock VerticalAlignment="Center" Width="50">Offset</TextBlock>
+                <TextBox TextAlignment="Right" Width="20" Text="1" 
+                         VerticalAlignment="Center" Margin="0,0,10,0"/>
+            </DockPanel>
+            <DockPanel Grid.Row="6" HorizontalAlignment="Center">
+                <TextBlock VerticalAlignment="Center" Width="50">Anchor</TextBlock>
+
+            </DockPanel>
+
         </Grid>
-        <Grid  Grid.Row="3">
+        <Grid x:Name="GridKernel"  Grid.Row="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
         </Grid>
 
     </Grid>
