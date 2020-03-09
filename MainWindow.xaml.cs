@@ -146,8 +146,13 @@ namespace CG_Project_I
         {
             if (resultImage.Source != null)
             {
+                double step = gammaStep;
+                if (GammaValue.Text.ToString() != "")                  
+                {
+                    step = Double.Parse(GammaValue.Text.ToString());                   
+                }
                 System.Drawing.Bitmap tmp = this.convertToBitmap(resultImage.Source);
-                this.functionalFilters.gamma(tmp, gammaStep);
+                this.functionalFilters.gamma(tmp, step);
                 resultImage.Source = (ImageSource)this.ImageSourceFromBitmap(tmp);
             }
             else
@@ -518,6 +523,16 @@ namespace CG_Project_I
             }
             else
                 MessageBox.Show("Please load an image", "No Image loaded");
+        }
+
+        private void NumberValidationTextBox(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex("[a-z]");
+            double result;
+            if (!double.TryParse(sender.ToString(), out result))
+            {
+                e.Handled =  regex.IsMatch(e.Text);
+            }
         }
     }
 }

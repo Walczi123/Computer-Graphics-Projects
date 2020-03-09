@@ -60,6 +60,25 @@ namespace CG_Project_I
                                 blue += tmp[2] * kernel[x, y];
                                 pixelCounter+=kernel[x, y];
                             }
+                            else
+                            {
+                                if(i - kernelStep + x < 0 && j - kernelStep + y < 0)
+                                {
+                                    byte* tmp = clone0 + (0) * cloneData.Stride + (0) * bitsPerPixel / 8;
+                                    red += tmp[0] * kernel[x, y];
+                                    green += tmp[1] * kernel[x, y];
+                                    blue += tmp[2] * kernel[x, y];
+                                    pixelCounter += kernel[x, y];
+                                }
+                                else
+                                {
+                                    byte* tmp = clone0 + (bData.Height-1) * cloneData.Stride + (bData.Width-1) * bitsPerPixel / 8;
+                                    red += tmp[0] * kernel[x, y];
+                                    green += tmp[1] * kernel[x, y];
+                                    blue += tmp[2] * kernel[x, y];
+                                    pixelCounter += kernel[x, y];
+                                }
+                            }
                         }
                     }
                     if (pixelCounter == 0) pixelCounter = 1;
@@ -107,6 +126,23 @@ namespace CG_Project_I
                                 red += tmp[0] * kernel[x, y];
                                 green += tmp[1] * kernel[x, y];
                                 blue += tmp[2] * kernel[x, y];
+                            }
+                            else
+                            {
+                                if (i - kernelStep + x < 0 && j - kernelStep + y < 0)
+                                {
+                                    byte* tmp = clone0 + (0) * cloneData.Stride + (0) * bitsPerPixel / 8;
+                                    red += tmp[0] * kernel[x, y];
+                                    green += tmp[1] * kernel[x, y];
+                                    blue += tmp[2] * kernel[x, y];
+                                }
+                                else
+                                {
+                                    byte* tmp = clone0 + (bData.Height - 1) * cloneData.Stride + (bData.Width - 1) * bitsPerPixel / 8;
+                                    red += tmp[0] * kernel[x, y];
+                                    green += tmp[1] * kernel[x, y];
+                                    blue += tmp[2] * kernel[x, y];
+                                }
                             }
                         }
                     }
@@ -157,7 +193,24 @@ namespace CG_Project_I
                                 green += tmp[1] * kernel[x, y];
                                 blue += tmp[2] * kernel[x, y];
                             }
-                        }
+                            else
+                            {
+                                if (i - kernelStepX + x < 0 && j - kernelStepY + y < 0)
+                                {
+                                    byte* tmp = clone0 + (0) * cloneData.Stride + (0) * bitsPerPixel / 8;
+                                    red += tmp[0] * kernel[x, y];
+                                    green += tmp[1] * kernel[x, y];
+                                    blue += tmp[2] * kernel[x, y];
+                                }
+                                else
+                                {
+                                    byte* tmp = clone0 + (bData.Height - 1) * cloneData.Stride + (bData.Width - 1) * bitsPerPixel / 8;
+                                    red += tmp[0] * kernel[x, y];
+                                    green += tmp[1] * kernel[x, y];
+                                    blue += tmp[2] * kernel[x, y];
+                                }
+                            }
+                        }                     
                     }
                     data[0] = (byte)(Clamp(red / denominator + offset));
                     data[1] = (byte)(Clamp(green / denominator + offset));
