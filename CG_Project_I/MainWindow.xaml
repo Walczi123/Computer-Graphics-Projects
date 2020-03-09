@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:CG_Project_I"
         mc:Ignorable="d"
         Title="Computer Grapihcs Project I" Height="600" Width="800"
-        MinHeight="650" MinWidth="550">
+        MinHeight="750" MinWidth="550">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -105,14 +105,17 @@
                 <RowDefinition Height="30" />
                 <RowDefinition Height="30" />
                 <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <StackPanel  Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.429,-0.962">
                 <Label>Choose Kernel</Label>
             </StackPanel>
             <DockPanel Grid.Row="1">
-                <ComboBox HorizontalAlignment="Center" Margin="0,0,0,0" Grid.Row="1" VerticalAlignment="Center" Width="130">
-                    <!--<ComboBoxItem Name="other">Ohter</ComboBoxItem>-->
+                <ComboBox x:Name="ComboBox" HorizontalAlignment="Center" Margin="0,0,0,0" Grid.Row="1" VerticalAlignment="Center" Width="130" SelectionChanged="ComboBox_SelectionChanged" SelectedIndex="0">
+                    <ComboBoxItem Name="custom">Custom</ComboBoxItem>
                     <ComboBoxItem Name="blur">Blur</ComboBoxItem>
                     <ComboBoxItem Name="gauss">Gaussian Blur</ComboBoxItem>
                     <ComboBoxItem Name="sharpen">Sharpen</ComboBoxItem>
@@ -133,20 +136,30 @@
             </DockPanel>
             <DockPanel Grid.Row="4" HorizontalAlignment="Center">
                 <TextBlock VerticalAlignment="Center" Width="50">Divisor</TextBlock>
-                <TextBox Name="Divisor" TextAlignment="Right" Width="20"
-                         VerticalAlignment="Center" Margin="0,0,10,0"/>
-                <Button x:Name="ComputeDivisor" Click="ComputeDivisor_Click">Compute</Button>
+                <TextBox Name="Divisor" TextAlignment="Right" Width="30"
+                         VerticalAlignment="Center" Margin="0,0,10,0"
+                         PreviewTextInput="TextBefore" TextChanged="TextBoxPasting"/>
+                <Button x:Name="ComputeDivisor" Click="ComputeDivisor_Click" Margin="0,5,5,5">Compute</Button>
             </DockPanel>
             <DockPanel Grid.Row="5" HorizontalAlignment="Center">
                 <TextBlock VerticalAlignment="Center" Width="50">Offset</TextBlock>
-                <TextBox TextAlignment="Right" Width="20" Text="1" 
-                         VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <TextBox x:Name="Offset" TextAlignment="Right" Width="30" Text="1" 
+                         VerticalAlignment="Center" Margin="0,0,10,0"
+                         />
             </DockPanel>
             <DockPanel Grid.Row="6" HorizontalAlignment="Center">
                 <TextBlock VerticalAlignment="Center" Width="50">Anchor</TextBlock>
 
             </DockPanel>
-
+            <DockPanel Grid.Row="7" HorizontalAlignment="Center">
+                <TextBlock VerticalAlignment="Center">X</TextBlock>
+                <TextBox x:Name="AnchorX" Width="20" Height="20" VerticalAlignment="Center" Margin="10,0,0,0" TextChanged="AnchorX_TextChanged"
+                         Text="1" PreviewTextInput="TextBefore"/>
+                <TextBlock Margin="30,0,0,0" VerticalAlignment="Center">Y</TextBlock>
+                <TextBox  x:Name="AnchorY" Width="20" Height="20" PreviewTextInput="TextBefore" VerticalAlignment="Center" Margin="10,0,0,0" TextChanged="AnchorY_TextChanged">1</TextBox>
+            </DockPanel>
+            <Button x:Name="SaveKernelButton" Grid.Row="8" Margin="10,5,10,5" Click="SaveKernelButton_Click">Save</Button>
+            <Button x:Name="RunKernelButton" Grid.Row="9" Margin="10,5,10,5" Click="RunKernelButton_Click" >Run Kernel</Button>
         </Grid>
         <Grid x:Name="GridKernel"  Grid.Row="3">
             <Grid.RowDefinitions>
@@ -160,6 +173,5 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
         </Grid>
-
     </Grid>
 </Window>

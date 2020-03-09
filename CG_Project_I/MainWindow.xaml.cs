@@ -23,6 +23,8 @@ namespace CG_Project_I
         private int brightnessStep = 50;
         private double contrastStep = 1.3;
         private double gammaStep = 1.2;
+        private string text;
+        private Tuple<int, int> anchor = new Tuple<int,int>(1,1);
 
         private int[,] kernelBlur = {{ 1, 1, 1 },
                                      { 1, 1, 1 },
@@ -39,11 +41,15 @@ namespace CG_Project_I
         private int[,] kernelEmboss = {{ -1, 0, 1 },
                                        { -1, 1, 1 },
                                        { -1, 0, 1 }};
+        private int[,] kernelCustom = {{ 1, 1, 1 },
+                                       { 1, 1, 1 },
+                                       { 1, 1, 1 }};
 
         public MainWindow()
         {
             InitializeComponent();
-            SetGrid(kernelBlur);
+            SetGrid(kernelCustom);
+            setAnchor();
         }
 
         private void loadImage(object sender, RoutedEventArgs e)
@@ -223,12 +229,6 @@ namespace CG_Project_I
 
         private void ChangeGrid(int col, int row)
         {
-            //for(int i = 0; i< col; i++)
-            //{
-            //    GridKernel.RowDefinitions.Add(new RowDefinition());
-            //    GridKernel.ColumnDefinitions.Add(new ColumnDefinition());
-            //}
-
             if (this.GridKernel.ColumnDefinitions.Count != col)
             {
                 int diffCol = col - GridKernel.ColumnDefinitions.Count;
@@ -257,10 +257,12 @@ namespace CG_Project_I
                         GridKernel.RowDefinitions.Add(new RowDefinition());
                 }
             }
+            setAnchor();
         }
 
         private void SetGrid(int[,] kernel)
         {
+            if (GridKernel == null) return;
             GridKernel.Children.Clear();
             int diff = GridKernel.ColumnDefinitions.Count - kernel.GetLength(0);
             diff /= 2;
@@ -278,38 +280,53 @@ namespace CG_Project_I
                     {
                         elem.Text = "0";
                     }
-                    
+                  
                     elem.HorizontalContentAlignment = HorizontalAlignment.Center;
                     elem.VerticalContentAlignment = VerticalAlignment.Center;
-                    //elem.PreviewTextInput = new PreviewTextInput(TextBoxPasting);
-                    //elem.InputBindings.Add(TextBoxPasting);
+                    elem.TextChanged += (TextChangedEventHandler)TextBoxPasting;
+                    elem.PreviewTextInput += TextBefore;
                     Grid.SetRow(elem, i);
                     Grid.SetColumn(elem, j);
                     GridKernel.Children.Add(elem);
                 }
             }
+            setAnchor();
         }
 
-        private static readonly Regex _regex = new Regex("[^0-9.-]+"); //regex that matches disallowed text
+        private static readonly Regex _regex = new Regex("[^0-9.-]+"); 
         private static bool IsTextAllowed(string text)
         {
             return !_regex.IsMatch(text);
         }
 
-        private void TextBoxPasting(object sender, DataObjectPastingEventArgs e)
+        private void TextBoxPasting(object sender, TextChangedEventArgs e)
         {
-            if (e.DataObject.GetDataPresent(typeof(String)))
+            TextBox t = (TextBox)(sender as TextBox);
+            String[] str = sender.ToString().Split(' ');
+            if (str.Length > 1)
             {
-                String text = (String)e.DataObject.GetData(typeof(String));
-                if (!IsTextAllowed(text))
+                if(!IsTextAllowed(sender.ToString().Split(' ')[1]))
                 {
-                    e.CancelCommand();
+                    t.Text = this.text;
                 }
             }
             else
             {
-                e.CancelCommand();
+                t.Text = "1";
+            }           
+        }
+        private void TextBefore(object sender, EventArgs e)
+        {
+            String[] str = sender.ToString().Split(' ');
+            if (str.Length > 1)
+            {
+                this.text = sender.ToString().Split(' ')[1];
             }
+            else
+            {
+                this.text = "";
+            }
+
         }
 
         private int[,] readGrid()
@@ -318,7 +335,7 @@ namespace CG_Project_I
             int[,] kernel = new int[size, size];
             foreach (TextBox c in GridKernel.Children)
             {
-                kernel[i++, j] = Int32.Parse(c.Text);
+                kernel[j, i++] = Int32.Parse(c.Text);
                 if (i >= size)
                 {
                     i = 0; j++;
@@ -360,6 +377,147 @@ namespace CG_Project_I
             }
             if (sum == 0) sum = 1;
             Divisor.Text = sum.ToString();
+        }
+
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBoxItem cbi = (ComboBoxItem)(sender as ComboBox).SelectedItem;
+            switch (cbi.Content.ToString())
+            {
+                case "Blur":
+                    SetGrid(kernelBlur);
+                    break;
+                case "Gaussian Blur":
+                    SetGrid(kernelGaussianBlur);
+                    break;
+                case "Sharpen":
+                    SetGrid(kernelSharpen);
+                    break;
+                case "Edge Detection":
+                    SetGrid(kernelEdgeDetection);
+                    break;
+                case "Emboss":
+                    SetGrid(kernelEmboss);
+                    break;
+                case "Custom":
+                    SetGrid(kernelCustom);
+                    break;
+            }
+        }
+
+        private void SaveKernelButton_Click(object sender, RoutedEventArgs e)
+        {
+           
+            switch (ComboBox.SelectedIndex.ToString())
+            {
+                case "0":
+                    kernelCustom = readGrid();
+                    SetGrid(kernelCustom);
+                    break;
+                case "1":
+                    kernelBlur = readGrid();
+                    SetGrid(kernelBlur);
+                    break;
+                case "2":
+                    kernelGaussianBlur = readGrid();
+                    SetGrid(kernelGaussianBlur);
+                    break;
+                case "3":
+                    kernelSharpen = readGrid();
+                    SetGrid(kernelSharpen);
+                    break;
+                case "4":
+                    kernelEdgeDetection = readGrid();
+                    SetGrid(kernelEdgeDetection);
+                    break;
+                case "5":
+                    kernelEmboss = readGrid();
+                    SetGrid(kernelEmboss);
+                    break;
+            }
+        }
+
+        private void AnchorX_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBox t = (TextBox)(sender as TextBox);
+            String[] str = sender.ToString().Split(' ');
+            if (str.Length > 1)
+            {
+                if (!IsTextAllowed(sender.ToString().Split(' ')[1]))
+                {
+                    t.Text = this.text;
+                }
+            }
+            else
+            {
+                t.Text = "1";
+            }
+            setAnchor();
+        }
+
+        private void AnchorY_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBox t = (TextBox)(sender as TextBox);
+            String[] str = sender.ToString().Split(' ');
+            if (str.Length > 1)
+            {
+                if (!IsTextAllowed(sender.ToString().Split(' ')[1]))
+                {
+                    t.Text = this.text;
+                }
+            }
+            else
+            {
+                t.Text = "1";
+            }
+            setAnchor();
+        }
+
+        private bool setAnchor()
+        {
+            if(AnchorX != null && AnchorY != null && GridKernel!=null
+                && AnchorX.Text.ToString()!="" && AnchorY.Text.ToString()!="")
+            {
+                int x = Int32.Parse(AnchorX.Text.ToString());
+                int y = Int32.Parse(AnchorY.Text.ToString());              
+                int col = GridKernel.ColumnDefinitions.Count;               
+                if (x < col && y < col)
+                {
+                    foreach (TextBox elem in GridKernel.Children)
+                    {
+                        elem.Background = System.Windows.Media.Brushes.White;
+                    }
+                    x *= GridKernel.ColumnDefinitions.Count;
+                    TextBox t = (TextBox)(GridKernel.Children[x + y] as TextBox);
+                    t.Background = System.Windows.Media.Brushes.Red;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void RunKernelButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (resultImage.Source != null)
+            {
+                var ker = readGrid();
+                int divisor = 1;
+                int offset = 0;
+                int anchorX = 0, anchorY = 0;
+                if(Divisor.Text.ToString()!="")
+                    divisor = Int32.Parse(Divisor.Text.ToString());
+                if (Offset.Text.ToString() != "")
+                    offset = Int32.Parse(Offset.Text.ToString());
+                if (AnchorX.Text.ToString() != "")
+                    anchorX = Int32.Parse(AnchorX.Text.ToString());
+                if (AnchorY.Text.ToString() != "")
+                    anchorY = Int32.Parse(AnchorY.Text.ToString());
+                System.Drawing.Bitmap tmp = this.convertToBitmap(resultImage.Source);
+                this.convolutionFilters.ConvolutionFunction(tmp, ker, divisor, offset, anchorX, anchorY);
+                resultImage.Source = (ImageSource)this.ImageSourceFromBitmap(tmp);
+            }
+            else
+                MessageBox.Show("Please load an image", "No Image loaded");
         }
     }
 }
