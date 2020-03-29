@@ -46,6 +46,7 @@ namespace CG_Project_II
         #endregion
         #region Project II
         private Dithering dithering = new Dithering();
+        private Quantization quantization = new Quantization();
         #endregion
         #endregion
         public MainWindow()
@@ -539,27 +540,79 @@ namespace CG_Project_II
             Application.Current.MainWindow.Height = 450;          
         }
 
-        private void DitheringClick(object sender, RoutedEventArgs e)
+        private void OnlyNumbersValidationTextBox(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex("^[0-9]*$");
+            e.Handled = !regex.IsMatch(e.Text);
+        }
+
+        private void ColorDitheringClick(object sender, RoutedEventArgs e)
         {
             if (resultImage.Source != null)
             {
-                int valuePerChannel=2;
-                if (ValuePerChannel.Text.ToString() != "")
+                int valuePerRed=2;
+                if (ValuePerRed.Text.ToString() != "")
                 {
-                    if (!Int32.TryParse(ValuePerChannel.Text.ToString(), out valuePerChannel)) { valuePerChannel = 2; }
+                    if (!Int32.TryParse(ValuePerRed.Text.ToString(), out valuePerRed)) { valuePerRed = 2; }
+                }
+                int valuePerGreen= 2;
+                if (ValuePerGreen.Text.ToString() != "")
+                {
+                    if (!Int32.TryParse(ValuePerGreen.Text.ToString(), out valuePerGreen)) { valuePerGreen = 2; }
+                }
+                int valuePerBlue = 2;
+                if (ValuePerBlue.Text.ToString() != "")
+                {
+                    if (!Int32.TryParse(ValuePerBlue.Text.ToString(), out valuePerBlue)) { valuePerBlue = 2; }
                 }
                 System.Drawing.Bitmap tmp = this.convertToBitmap(resultImage.Source);
-                this.dithering.Average(tmp, valuePerChannel);
+                this.dithering.AverageColor(tmp, valuePerRed, valuePerGreen, valuePerBlue);
                 resultImage.Source = (ImageSource)this.ImageSourceFromBitmap(tmp);
             }
             else
                 MessageBox.Show("Please load an image", "No Image loaded");
         }
 
-        private void ValueParChannelValidationTextBox(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        private void BWDitheringClick(object sender, RoutedEventArgs e)
         {
-            Regex regex = new Regex("^[0-9]*$");
-            e.Handled = !regex.IsMatch(e.Text);
+            if (resultImage.Source != null)
+            {
+                int valuePerChannel = 2;
+                if (ValuePerChannel.Text.ToString() != "")
+                {
+                    if (!Int32.TryParse(ValuePerChannel.Text.ToString(), out valuePerChannel)) { valuePerChannel = 2; }
+                }
+                System.Drawing.Bitmap tmp = this.convertToBitmap(resultImage.Source);
+                this.dithering.AverageBW(tmp, valuePerChannel);
+                resultImage.Source = (ImageSource)this.ImageSourceFromBitmap(tmp);
+            }
+            else
+                MessageBox.Show("Please load an image", "No Image loaded");
+        }
+
+        private void ConvertToBW(object sender, RoutedEventArgs e)
+        {
+            if (resultImage.Source != null)
+            {              
+                System.Drawing.Bitmap tmp = this.convertToBitmap(resultImage.Source);
+                this.dithering.ToGrayScale(tmp);
+                resultImage.Source = (ImageSource)this.ImageSourceFromBitmap(tmp);
+            }
+            else
+                MessageBox.Show("Please load an image", "No Image loaded");
+        }
+
+        private void MedianCutClick(object sender, RoutedEventArgs e)
+        {
+            if (resultImage.Source != null)
+            {
+                int numberOfColors = Int32.Parse(ComboCoxMedianCut.SelectedItem.ToString().Split(' ')[1]);
+                System.Drawing.Bitmap tmp = this.convertToBitmap(resultImage.Source);
+                this.quantization.MedianCut(tmp, numberOfColors);
+                resultImage.Source = (ImageSource)this.ImageSourceFromBitmap(tmp);
+            }
+            else
+                MessageBox.Show("Please load an image", "No Image loaded");
         }
     }
 }

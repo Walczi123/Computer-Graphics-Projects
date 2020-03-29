@@ -65,11 +65,12 @@
                    Source=".\example.jpg"/>
                 </Border>
             </DockPanel>
-            <DockPanel Grid.Column="0" Grid.Row="4" >
-                <Button x:Name="loadButton" Content="Load Image" HorizontalAlignment="Center" VerticalAlignment="Center" Width="75" Click="loadImage"/>
+            <DockPanel Grid.Column="0" Grid.Row="4" HorizontalAlignment="Center">
+                <Button x:Name="loadButton" Content="Load Image" HorizontalAlignment="Center" VerticalAlignment="Center" Width="75" Click="loadImage" Margin="15,0,15,0"/>
+                <Button x:Name="saveButton" Content="Save Image" HorizontalAlignment="Center" VerticalAlignment="Center" Width="75" Click="saveImage" Margin="15,0,15,0"/>
             </DockPanel>
             <DockPanel Grid.Column="1" Grid.Row="4" >
-                <Button x:Name="saveButton" Content="Save Image" HorizontalAlignment="Center" VerticalAlignment="Center" Width="75" Click="saveImage"/>
+                <Button x:Name="resetButton" Content="Reset Image" HorizontalAlignment="Center" VerticalAlignment="Center" Width="75" Click="resetImage"/>
             </DockPanel>
         </Grid>
         <Grid Grid.Column="1" Grid.Row="1" Background="#FFBAC0C5">
@@ -110,22 +111,46 @@
                 <RowDefinition Height="30" />
                 <RowDefinition Height="30" />
                 <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
                 <RowDefinition Height="40" />
-                <RowDefinition Height="30" />
-                <RowDefinition Height="30" />
-                <RowDefinition Height="30" />
-                <RowDefinition Height="30" />
-                <RowDefinition Height="30" />
+                <RowDefinition Height="46" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Label VerticalAlignment="Center" HorizontalAlignment="Center">Average Dithering</Label>
-            <TextBlock Grid.Row="1">Type color value per channle (defalut 2)</TextBlock>
-            <DockPanel Grid.Row="2">
-                <Button Content="Average Dithering" HorizontalAlignment="Center" VerticalAlignment="Center"  Click="DitheringClick" Margin="5,0,0,0"/>
-                <TextBox x:Name="ValuePerChannel" Width="25" Margin="0,5,0,5" PreviewTextInput="ValueParChannelValidationTextBox">2</TextBox>
+            <TextBlock Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center">Color Variant</TextBlock>
+            <DockPanel Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" >
+                <TextBlock Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,0,0">R :</TextBlock>
+                <TextBox x:Name="ValuePerRed" Width="25" Margin="5,5,5,5" PreviewTextInput="OnlyNumbersValidationTextBox">2</TextBox>
+                <TextBlock Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center">G :</TextBlock>
+                <TextBox x:Name="ValuePerGreen" Width="25" Margin="5,5,5,5" PreviewTextInput="OnlyNumbersValidationTextBox">2</TextBox>
+                <TextBlock Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center">B :</TextBlock>
+                <TextBox x:Name="ValuePerBlue" Width="25" Margin="5,5,5,5" PreviewTextInput="OnlyNumbersValidationTextBox">2</TextBox>
+            </DockPanel>
+            <Button Grid.Row="3" Width="120" Content="Performe for Colors" HorizontalAlignment="Center" VerticalAlignment="Center"  Click="ColorDitheringClick" Margin="5,0,0,0"/>
+            <TextBlock Grid.Row="4" VerticalAlignment="Center" HorizontalAlignment="Center">Black-White Variant</TextBlock>
+            <Button Grid.Row="5" Width="135" Content="Convert to Black-White" HorizontalAlignment="Center" VerticalAlignment="Center"  Click="ConvertToBW" Margin="5,0,0,0"/>
+            <DockPanel Grid.Row="6" HorizontalAlignment="Center" VerticalAlignment="Center" >
+                <Button Content="Perform for BW" Width="100" HorizontalAlignment="Center" VerticalAlignment="Center"  Click="BWDitheringClick" Margin="5,0,0,0"/>
+                <TextBox x:Name="ValuePerChannel" Width="25" Margin="5,5,5,5" PreviewTextInput="OnlyNumbersValidationTextBox">2</TextBox>
+            </DockPanel>
+            <Label Grid.Row="7" VerticalAlignment="Center" HorizontalAlignment="Center">Color quantization</Label>
+            <DockPanel Grid.Row="8" HorizontalAlignment="Center" VerticalAlignment="Center" >
+                <Button Content="Median Cut" Width="80" HorizontalAlignment="Center" VerticalAlignment="Center"  Click="MedianCutClick" Margin="5,0,0,0"/>
+                <ComboBox x:Name="ComboCoxMedianCut" HorizontalAlignment="Center" VerticalAlignment="Center" Width="50" Height="26" Margin="5,5,5,5" SelectedIndex="0">
+                    <ComboBoxItem>2</ComboBoxItem>
+                    <ComboBoxItem>4</ComboBoxItem>
+                    <ComboBoxItem>8</ComboBoxItem>
+                    <ComboBoxItem>16</ComboBoxItem>
+                    <ComboBoxItem>32</ComboBoxItem>
+                    <ComboBoxItem>64</ComboBoxItem>
+                    <ComboBoxItem>128</ComboBoxItem>
+                    <ComboBoxItem>256</ComboBoxItem>
+                </ComboBox>
             </DockPanel>
             
-            
+
+
         </Grid>
         <GridSplitter Grid.Row="2" Height="5" HorizontalAlignment="Stretch" Grid.ColumnSpan="2"/>
         <Grid Grid.Column="1" Grid.Row="3" Background="#FFBAC0C5">
