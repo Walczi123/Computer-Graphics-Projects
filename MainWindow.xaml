@@ -114,7 +114,9 @@
                 <RowDefinition Height="30" />
                 <RowDefinition Height="30" />
                 <RowDefinition Height="40" />
-                <RowDefinition Height="46" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="40" />
+                <RowDefinition Height="30" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Label VerticalAlignment="Center" HorizontalAlignment="Center">Average Dithering</Label>
@@ -148,9 +150,12 @@
                     <ComboBoxItem>256</ComboBoxItem>
                 </ComboBox>
             </DockPanel>
-            
-
-
+            <Label Grid.Row="9" VerticalAlignment="Center" HorizontalAlignment="Center">Convert RGB into YCbCr</Label>
+            <DockPanel Grid.Row="10" HorizontalAlignment="Center" VerticalAlignment="Center" >
+                <Button Content="Y" Width="30"  HorizontalAlignment="Center" VerticalAlignment="Center"  Click="YClick" Margin="5,0,0,0"/>
+                <Button Content="Cb" Width="30" HorizontalAlignment="Center" VerticalAlignment="Center"  Click="CbClick" Margin="5,0,0,0"/>
+                <Button Content="Cr" Width="30" HorizontalAlignment="Center" VerticalAlignment="Center"  Click="CrClick" Margin="5,0,0,0"/>
+            </DockPanel>
         </Grid>
         <GridSplitter Grid.Row="2" Height="5" HorizontalAlignment="Stretch" Grid.ColumnSpan="2"/>
         <Grid Grid.Column="1" Grid.Row="3" Background="#FFBAC0C5">

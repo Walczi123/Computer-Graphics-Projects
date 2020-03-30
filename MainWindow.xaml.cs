@@ -47,6 +47,7 @@ namespace CG_Project_II
         #region Project II
         private Dithering dithering = new Dithering();
         private Quantization quantization = new Quantization();
+        private ConvertionYCbCr convertionYCbCr = new ConvertionYCbCr();
         #endregion
         #endregion
         public MainWindow()
@@ -609,6 +610,42 @@ namespace CG_Project_II
                 int numberOfColors = Int32.Parse(ComboCoxMedianCut.SelectedItem.ToString().Split(' ')[1]);
                 System.Drawing.Bitmap tmp = this.convertToBitmap(resultImage.Source);
                 this.quantization.MedianCut(tmp, numberOfColors);
+                resultImage.Source = (ImageSource)this.ImageSourceFromBitmap(tmp);
+            }
+            else
+                MessageBox.Show("Please load an image", "No Image loaded");
+        }
+
+        private void YClick(object sender, RoutedEventArgs e)
+        {
+            if (resultImage.Source != null)
+            {
+                System.Drawing.Bitmap tmp = this.convertToBitmap(resultImage.Source);
+                this.convertionYCbCr.Y(tmp);
+                resultImage.Source = (ImageSource)this.ImageSourceFromBitmap(tmp);
+            }
+            else
+                MessageBox.Show("Please load an image", "No Image loaded");
+        }
+
+        private void CbClick(object sender, RoutedEventArgs e)
+        {
+            if (resultImage.Source != null)
+            {
+                System.Drawing.Bitmap tmp = this.convertToBitmap(resultImage.Source);
+                this.convertionYCbCr.Cb(tmp);
+                resultImage.Source = (ImageSource)this.ImageSourceFromBitmap(tmp);
+            }
+            else
+                MessageBox.Show("Please load an image", "No Image loaded");
+        }
+
+        private void CrClick(object sender, RoutedEventArgs e)
+        {
+            if (resultImage.Source != null)
+            {
+                System.Drawing.Bitmap tmp = this.convertToBitmap(resultImage.Source);
+                this.convertionYCbCr.Cr(tmp);
                 resultImage.Source = (ImageSource)this.ImageSourceFromBitmap(tmp);
             }
             else
