@@ -5,16 +5,58 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CG_Project_III"
         mc:Ignorable="d"
-        Title="CG_Project_III" Height="450" Width="800">
-    <Grid>
+        Title="CG_Project_III" Height="430" Width="870" MinHeight="360" MinWidth="640"
+        ContentRendered="Window_ContentRendered"
+    SizeChanged="Window_SizeChanged">
+    <Grid x:Name="MyGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="150"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="50"></RowDefinition>
-            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Canvas Grid.Row="2" Name="paintSurface" MouseDown="Canvas_MouseDown_1" MouseMove="Canvas_MouseMove_1"  MouseUp="Canvas_MouseUp_1">
-            <Canvas.Background>
-                <SolidColorBrush Color="White" Opacity="0"/>
-            </Canvas.Background>
-        </Canvas>
+        <DockPanel Grid.Row="0" Grid.ColumnSpan="2">
+            <Menu DockPanel.Dock="Top">
+                <MenuItem Header="_Options" Height="25">
+                    <MenuItem Header="_Clear" Click="menu_clear"/>
+                    <Separator />
+                    <MenuItem Header="_Exit" Click="menu_shutdown"/>
+                </MenuItem>
+            </Menu>
+        </DockPanel>
+
+        <Grid Grid.Column="1" Grid.Row="1" Background="#FFBAC0C5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="20"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <DockPanel Grid.Column="0">
+                    <TextBlock FontSize="10" Text="X " VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10,0,10,0"/>
+                    <TextBlock FontSize="10" x:Name="MouseX" Text="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,5,0"/>
+                </DockPanel>
+                <DockPanel Grid.Column="1">
+                    <TextBlock FontSize="10" Text="Y " VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10,0,10,0"/>
+                    <TextBlock FontSize="10" x:Name="MouseY" Text="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,5,0"/>
+                </DockPanel>
+            </Grid>
+            <TextBlock Text="Draw" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+            <Button Grid.Row="1" Margin="5,5,5,5" Content="Point" Click="Point_Click"/>
+            <Button Grid.Row="2" Margin="5,5,5,5" Content="Line" Click="Line_Click"/>
+            <Button Grid.Row="3" Margin="5,5,5,5" Content="Circle" Click="Circle_Click"/>
+        </Grid>
+        <Image x:Name="image" Grid.Row="2" Stretch="Fill" 
+               MouseDown="Image_MouseDown"  MouseMove="Image_MouseMove" MouseUp="Image_MouseUp"/>
     </Grid>
 </Window>
