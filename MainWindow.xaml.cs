@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -11,31 +13,39 @@ namespace CG_Project_III
     /// </summary>
     public partial class MainWindow : Window
     {
-        private WriteableBitmap bitmap = new WriteableBitmap(100, 100, 96, 96, PixelFormats.Bgr32, null);
+        private WriteableBitmap bitmap = new WriteableBitmap(100, 100, 96, 96, PixelFormats.Bgra32, null);
         private int current_drawing = 0;
+        private bool thickness = false;
+        private bool antiAliasing = false;
+        private Color mainColor = new Color();
+        private Color otherColor = new Color();
         private Point lastPosition = new Point();
         private Algorithms algorithms = new Algorithms();
         public MainWindow()
         {
             InitializeComponent();
             image.Source = bitmap;
-           
+            MyBitmap.Bitmap = bitmap;
         }
 
         private void Window_ContentRendered(object sender, EventArgs e)
         {
-            this.bitmap = new WriteableBitmap((int)image.ActualWidth + 1, (int)image.ActualHeight + 1, 96, 96, PixelFormats.Bgr32, null);
-            MyBitmap.CleanDrawArea(bitmap);
+            this.bitmap = new WriteableBitmap((int)image.ActualWidth + 1, (int)image.ActualHeight + 1, 96, 96, PixelFormats.Bgra32, null);
             image.Source = bitmap;
+            MyBitmap.Bitmap = bitmap;
+            MyBitmap.CleanDrawArea();
+            ThicknessComboBox.ItemsSource= Enumerable.Range(2, 49).Select(i => (object)i).ToArray();
         }
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             if ((int)image.ActualWidth > 0 && (int)image.ActualHeight > 0)
             {
-                this.bitmap = new WriteableBitmap((int)image.ActualWidth + 1, (int)image.ActualHeight + 1, 96, 96, PixelFormats.Bgr32, null);
+                this.bitmap = new WriteableBitmap((int)image.ActualWidth + 1, (int)image.ActualHeight + 1, 96, 96, PixelFormats.Bgra32, null);
                 //    this.bitmap = RewritableBitmap.ResizeWritableBitmap(bitmap, (int)image.ActualWidth, (int)image.ActualHeight);
-                MyBitmap.CleanDrawArea(bitmap);
+
                 image.Source = bitmap;
+                MyBitmap.Bitmap = bitmap;
+                MyBitmap.CleanDrawArea();
             }
         }
 
@@ -45,7 +55,7 @@ namespace CG_Project_III
         }
         private void menu_clear(object sender, RoutedEventArgs e)
         {
-            MyBitmap.CleanDrawArea(bitmap);
+            MyBitmap.CleanDrawArea();
         }     
         private void Image_MouseMove(object sender, MouseEventArgs e)
         {
@@ -66,26 +76,102 @@ namespace CG_Project_III
             switch (current_drawing)
             {
                 case 0:
-                    MyBitmap.DrawPixel(bitmap, x, y);
+                    if (thickness && ThicknessComboBox.SelectedItem != null)
+                    {
+                        var brushSize = Int32.Parse(ThicknessComboBox.SelectedItem.ToString());
+                        this.algorithms.Brush(x, y, brushSize, mainColor);
+                    }
+                    else
+                        this.algorithms.Brush( x, y, 0, mainColor);
                     break;
                 case 1:
-                    this.algorithms.lineDDA((int)lastPosition.X, (int)lastPosition.Y, x, y, bitmap);
+                    if (antiAliasing)
+                        this.algorithms.WuLine((int)lastPosition.X, (int)lastPosition.Y, x, y, mainColor, otherColor);
+                    if (thickness && ThicknessComboBox.SelectedItem != null)
+                    {
+
+                        var brushSize = Int32.Parse(ThicknessComboBox.SelectedItem.ToString());
+                        this.algorithms.lineDDA((int)lastPosition.X, (int)lastPosition.Y, x, y, mainColor, brushSize);
+                    }                     
+                    else
+                        this.algorithms.lineDDA((int)lastPosition.X, (int)lastPosition.Y, x, y, mainColor, 0);
                     break;
-                case 2: break;
+                case 2:
+                    int R = (int)Math.Sqrt(Math.Pow(x - (int)lastPosition.X, 2) + Math.Pow(y - (int)lastPosition.Y, 2));
+                    if(antiAliasing)
+                        this.algorithms.WuCircle((int)lastPosition.X, (int)lastPosition.Y, R, mainColor, otherColor);
+                    else
+                        this.algorithms.MidpointCircle((int)lastPosition.X, (int)lastPosition.Y, R, mainColor);
+                    break;
             }
         }
 
         private void Point_Click(object sender, RoutedEventArgs e)
         {
             current_drawing = 0;
+            ButtonPoint.IsEnabled = false;
+            ButtonLine.IsEnabled = true;
+            ButtonCircle.IsEnabled = true;
         }
         private void Line_Click(object sender, RoutedEventArgs e)
         {
             current_drawing = 1;
+            ButtonPoint.IsEnabled = true;
+            ButtonLine.IsEnabled = false;
+            ButtonCircle.IsEnabled = true;
         }        
         private void Circle_Click(object sender, RoutedEventArgs e)
         {
             current_drawing = 2;
+            ButtonPoint.IsEnabled = true;
+            ButtonLine.IsEnabled = true;
+            ButtonCircle.IsEnabled = false;
+        }
+        private void Selected_Color1(object sender, RoutedPropertyChangedEventArgs<Color?> e)
+        {
+            if (cp1.SelectedColor.HasValue)
+            {
+                mainColor = cp1.SelectedColor.Value;
+                otherColor = Color.FromArgb(127, mainColor.R, mainColor.G, mainColor.B);
+                if (cp2 != null)
+                {
+                    cp2.SelectedColor = otherColor;
+                }             
+            }
+        }
+
+        private void Selected_Color2(object sender, RoutedPropertyChangedEventArgs<Color?> e)
+        {
+            if (cp2.SelectedColor.HasValue)
+            {
+                otherColor = cp2.SelectedColor.Value;
+            }
+        }
+
+        private void OnlyNumbersValidationTextBox(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex("^[0-9]$");
+            e.Handled = !regex.IsMatch(e.Text);
+        }
+
+        private void CheckBox_Checked_Thickness(object sender, RoutedEventArgs e)
+        {
+            thickness = true;
+        }
+
+        private void CheckBox_Unchecked_Thickness(object sender, RoutedEventArgs e)
+        {
+            thickness = false;
+        }
+
+        private void CheckBox_Checked_AA(object sender, RoutedEventArgs e)
+        {
+            antiAliasing = true;
+        }
+
+        private void CheckBox_Unchecked_AA(object sender, RoutedEventArgs e)
+        {
+            antiAliasing = false;
         }
     }
 
