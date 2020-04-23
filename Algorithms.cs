@@ -4,10 +4,9 @@ using System.Windows.Media.Imaging;
 
 namespace CG_Project_III
 {
-    public class Algorithms
+    public static class Algorithms
     {
-        public Algorithms() { }
-        public void lineDDA(int x1, int y1, int x2, int y2, Color color, int brushSize)
+        public static void lineDDA(int x1, int y1, int x2, int y2, Color color, int brushSize)
         {
             int steps, k, _x, _y;
             float mx, my, x, y;
@@ -32,7 +31,7 @@ namespace CG_Project_III
                     _x = (int)x;
                     y += my;
                     _y = (int)y;
-                    this.Brush(_x, _y, brushSize, color);
+                    Algorithms.Brush(_x, _y, brushSize, color);
                 }
             }
             else
@@ -48,7 +47,7 @@ namespace CG_Project_III
             }
         }
 
-        public void MidpointCircle(int origin_x, int origin_y,int R, Color color)
+        public static void MidpointCircle(int origin_x, int origin_y,int R, Color color)
         {
             int dE = 3;
             int dSE = 5 - 2 * R;
@@ -85,7 +84,7 @@ namespace CG_Project_III
             }
         }
 
-        public void Brush(int x, int y, int size, Color color)
+        public static void Brush(int x, int y, int size, Color color)
         {
             if(size == 0)
             {
@@ -104,8 +103,10 @@ namespace CG_Project_III
             }
         }
 
-        public void WuLine(int x1, int y1, int x2, int y2, Color L, Color B)
+        public static void WuLine(int x1, int y1, int x2, int y2, Color col1, Color col2)
         {
+            var L = System.Windows.Media.Color.FromArgb((byte)col1.A, (byte)col1.R, (byte)col1.G, (byte)col1.B);
+            var B= System.Windows.Media.Color.FromArgb((byte)col2.A, (byte)col2.R, (byte)col2.G, (byte)col2.B);
             int steps, k, _x, _y;
             float mx, my, x, y;
 
@@ -128,16 +129,18 @@ namespace CG_Project_III
                 _x = (int)x;
                 y += my;
                 _y = (int)y;
-                Color c1 = L * (1 - (int)Math.Truncate(y)) + B * (int)Math.Truncate(y);
-                Color c2 = L * (int)Math.Truncate(y) + B * (1 - (int)Math.Truncate(y));
+                var c1 = L * (1 - (int)Math.Truncate(y)) + B * (int)Math.Truncate(y);
+                var c2 = L * (int)Math.Truncate(y) + B * (1 - (int)Math.Truncate(y));
                 MyBitmap.DrawPixel(_x,_y, c1);
                 MyBitmap.DrawPixel(_x, _y + 1, c2);
             }
         }
 
 
-        public void WuCircle(int origin_x, int origin_y, int R, Color L, Color B)
+        public static void WuCircle(int origin_x, int origin_y, int R, Color col1, Color col2)
         {
+            var L = System.Windows.Media.Color.FromArgb((byte)col1.A, (byte)col1.R, (byte)col1.G, (byte)col1.B);
+            var B = System.Windows.Media.Color.FromArgb((byte)col2.A, (byte)col2.R, (byte)col2.G, (byte)col2.B);
             int x = R;
             int y = 0;
             MyBitmap.DrawPixel(origin_x + x, origin_y + y, L);
@@ -148,8 +151,8 @@ namespace CG_Project_III
                 ++y;
                 x = (int)Math.Ceiling(Math.Sqrt(R * R - y * y));
                 float T = (float)(Math.Sqrt(R * R - y * y) - x);
-                Color c2 = L * (1 - T) + B * T;
-                Color c1 = L * T + B * (1 - T);
+                var c2 = L * (1 - T) + B * T;
+                var c1 = L * T + B * (1 - T);
                 MyBitmap.DrawPixel(origin_x + x, origin_y + y, c2);
                 MyBitmap.DrawPixel(origin_x + x, origin_y - y, c2);
                 MyBitmap.DrawPixel(origin_x - x, origin_y + y, c2);

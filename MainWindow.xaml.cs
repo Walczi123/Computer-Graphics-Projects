@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace CG_Project_III
@@ -13,14 +16,14 @@ namespace CG_Project_III
     /// </summary>
     public partial class MainWindow : Window
     {
-        private WriteableBitmap bitmap = new WriteableBitmap(100, 100, 96, 96, PixelFormats.Bgra32, null);
+        private WriteableBitmap bitmap = new WriteableBitmap(100, 100, 96, 96, System.Windows.Media.PixelFormats.Bgra32, null);
         private int current_drawing = 0;
         private bool thickness = false;
-        private bool antiAliasing = false;
-        private Color mainColor = new Color();
-        private Color otherColor = new Color();
+        private bool firstClick = false;
         private Point lastPosition = new Point();
-        private Algorithms algorithms = new Algorithms();
+        private Point firstPosition = new Point();
+        private Polygon CurrentPolygon = null;
+        private List<IShape> shapes = new List<IShape>() { };
         public MainWindow()
         {
             InitializeComponent();
@@ -30,7 +33,7 @@ namespace CG_Project_III
 
         private void Window_ContentRendered(object sender, EventArgs e)
         {
-            this.bitmap = new WriteableBitmap((int)image.ActualWidth + 1, (int)image.ActualHeight + 1, 96, 96, PixelFormats.Bgra32, null);
+            this.bitmap = new WriteableBitmap((int)image.ActualWidth + 1, (int)image.ActualHeight + 1, 96, 96, System.Windows.Media.PixelFormats.Bgra32, null);
             image.Source = bitmap;
             MyBitmap.Bitmap = bitmap;
             MyBitmap.CleanDrawArea();
@@ -40,12 +43,10 @@ namespace CG_Project_III
         {
             if ((int)image.ActualWidth > 0 && (int)image.ActualHeight > 0)
             {
-                this.bitmap = new WriteableBitmap((int)image.ActualWidth + 1, (int)image.ActualHeight + 1, 96, 96, PixelFormats.Bgra32, null);
-                //    this.bitmap = RewritableBitmap.ResizeWritableBitmap(bitmap, (int)image.ActualWidth, (int)image.ActualHeight);
-
+                this.bitmap = new WriteableBitmap((int)image.ActualWidth + 1, (int)image.ActualHeight + 1, 96, 96, System.Windows.Media.PixelFormats.Bgra32, null);               
                 image.Source = bitmap;
                 MyBitmap.Bitmap = bitmap;
-                MyBitmap.CleanDrawArea();
+                MyBitmap.Redraw(shapes);
             }
         }
 
@@ -65,8 +66,11 @@ namespace CG_Project_III
         }
         private void Image_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            lastPosition.X = e.GetPosition(image).X;
-            lastPosition.Y = e.GetPosition(image).Y;          
+            if(current_drawing != 3)
+            {
+                lastPosition.X = (int)e.GetPosition(image).X;
+                lastPosition.Y = (int)e.GetPosition(image).Y;
+            }
         }
 
         private void Image_MouseUp(object sender, MouseButtonEventArgs e)
@@ -79,31 +83,77 @@ namespace CG_Project_III
                     if (thickness && ThicknessComboBox.SelectedItem != null)
                     {
                         var brushSize = Int32.Parse(ThicknessComboBox.SelectedItem.ToString());
-                        this.algorithms.Brush(x, y, brushSize, mainColor);
+                        MyBitmap.DrawPoint(x, y, brushSize);
+                        shapes.Add(new Point(x, y, brushSize, MyBitmap.FirstColor));
                     }
                     else
-                        this.algorithms.Brush( x, y, 0, mainColor);
+                    {
+                        MyBitmap.DrawPoint(x, y, 0);
+                        shapes.Add(new Point(x, y, MyBitmap.FirstColor));
+                    }
                     break;
                 case 1:
-                    if (antiAliasing)
-                        this.algorithms.WuLine((int)lastPosition.X, (int)lastPosition.Y, x, y, mainColor, otherColor);
                     if (thickness && ThicknessComboBox.SelectedItem != null)
                     {
-
                         var brushSize = Int32.Parse(ThicknessComboBox.SelectedItem.ToString());
-                        this.algorithms.lineDDA((int)lastPosition.X, (int)lastPosition.Y, x, y, mainColor, brushSize);
-                    }                     
+                        MyBitmap.DrawLine(lastPosition.X, lastPosition.Y, x, y, brushSize);
+                        shapes.Add(new Line(lastPosition.X, lastPosition.Y, x, y, brushSize, MyBitmap.FirstColor, MyBitmap.SecondColor));
+                    }
                     else
-                        this.algorithms.lineDDA((int)lastPosition.X, (int)lastPosition.Y, x, y, mainColor, 0);
+                    {
+                        shapes.Add(new Line(lastPosition.X, lastPosition.Y, x, y, MyBitmap.FirstColor, MyBitmap.SecondColor));
+                        MyBitmap.DrawLine(lastPosition.X, lastPosition.Y, x, y, 0);
+                    }                                        
                     break;
                 case 2:
-                    int R = (int)Math.Sqrt(Math.Pow(x - (int)lastPosition.X, 2) + Math.Pow(y - (int)lastPosition.Y, 2));
-                    if(antiAliasing)
-                        this.algorithms.WuCircle((int)lastPosition.X, (int)lastPosition.Y, R, mainColor, otherColor);
+                    int R = (int)Math.Sqrt(Math.Pow(x - lastPosition.X, 2) + Math.Pow(y - lastPosition.Y, 2));
+                    MyBitmap.DrawCircle(lastPosition.X, lastPosition.Y, R);
+                    shapes.Add(new Circle(lastPosition.X, lastPosition.Y, R, MyBitmap.FirstColor, MyBitmap.SecondColor));
+                    break;
+                case 3:
+                    if (!firstClick)
+                    {
+                        firstPosition.X = x;
+                        firstPosition.Y = y;     
+                        lastPosition.X = x;
+                        lastPosition.Y = y;
+                                               
+                        if (thickness && ThicknessComboBox.SelectedItem != null)
+                        {
+                            var brushSize = Int32.Parse(ThicknessComboBox.SelectedItem.ToString());
+                            MyBitmap.DrawPoint(x, y, brushSize);
+                            CurrentPolygon =  new Polygon(brushSize, MyBitmap.FirstColor, MyBitmap.SecondColor);
+                            CurrentPolygon.Add(new Point(x, y));
+                        }
+                        else
+                        {
+                            MyBitmap.DrawPoint(firstPosition.X, firstPosition.Y, 0);
+                            CurrentPolygon = new Polygon(MyBitmap.FirstColor, MyBitmap.SecondColor);
+                            CurrentPolygon.Add(new Point(x, y));
+                        }
+                        firstClick = !firstClick;
+                    }
                     else
-                        this.algorithms.MidpointCircle((int)lastPosition.X, (int)lastPosition.Y, R, mainColor);
+                    {
+                        var d = Math.Sqrt(Math.Pow(x - firstPosition.X, 2) + Math.Pow(y - firstPosition.Y,2));
+                        if (d < 10)
+                        {
+                            MyBitmap.DrawLine(lastPosition.X, lastPosition.Y, firstPosition.X, firstPosition.Y, CurrentPolygon.BrushSize);
+                            this.shapes.Add(CurrentPolygon);
+                            CurrentPolygon = null;
+                            firstClick = !firstClick;
+                        }
+                        else
+                        {
+                            MyBitmap.DrawLine(lastPosition.X, lastPosition.Y, x, y, CurrentPolygon.BrushSize);
+                            lastPosition.X = x;
+                            lastPosition.Y = y;
+                            CurrentPolygon.Add(new Point(x, y));
+                        }
+                    }                   
                     break;
             }
+                 
         }
 
         private void Point_Click(object sender, RoutedEventArgs e)
@@ -112,6 +162,7 @@ namespace CG_Project_III
             ButtonPoint.IsEnabled = false;
             ButtonLine.IsEnabled = true;
             ButtonCircle.IsEnabled = true;
+            ButtonPolygon.IsEnabled = true;
         }
         private void Line_Click(object sender, RoutedEventArgs e)
         {
@@ -119,6 +170,7 @@ namespace CG_Project_III
             ButtonPoint.IsEnabled = true;
             ButtonLine.IsEnabled = false;
             ButtonCircle.IsEnabled = true;
+            ButtonPolygon.IsEnabled = true;
         }        
         private void Circle_Click(object sender, RoutedEventArgs e)
         {
@@ -126,25 +178,35 @@ namespace CG_Project_III
             ButtonPoint.IsEnabled = true;
             ButtonLine.IsEnabled = true;
             ButtonCircle.IsEnabled = false;
+            ButtonPolygon.IsEnabled = true;
+        }        
+        private void Polygon_Click(object sender, RoutedEventArgs e)
+        {
+            current_drawing = 3;
+            ButtonPoint.IsEnabled = true;
+            ButtonLine.IsEnabled = true;
+            ButtonCircle.IsEnabled = true;
+            ButtonPolygon.IsEnabled = false;
         }
-        private void Selected_Color1(object sender, RoutedPropertyChangedEventArgs<Color?> e)
+        private void Selected_Color1(object sender, RoutedPropertyChangedEventArgs<System.Windows.Media.Color?> e)
         {
             if (cp1.SelectedColor.HasValue)
             {
-                mainColor = cp1.SelectedColor.Value;
-                otherColor = Color.FromArgb(127, mainColor.R, mainColor.G, mainColor.B);
+                var mainColor = new Color(cp1.SelectedColor.Value);
+                MyBitmap.FirstColor = mainColor;
                 if (cp2 != null)
                 {
-                    cp2.SelectedColor = otherColor;
+                    cp2.SelectedColor = System.Windows.Media.Color.FromArgb(127, (byte)mainColor.R, (byte)mainColor.G, (byte)mainColor.B);
+                    MyBitmap.SecondColor = new Color(cp2.SelectedColor.Value);
                 }             
             }
         }
 
-        private void Selected_Color2(object sender, RoutedPropertyChangedEventArgs<Color?> e)
+        private void Selected_Color2(object sender, RoutedPropertyChangedEventArgs<System.Windows.Media.Color?> e)
         {
             if (cp2.SelectedColor.HasValue)
             {
-                otherColor = cp2.SelectedColor.Value;
+                MyBitmap.SecondColor = new Color(cp2.SelectedColor.Value);
             }
         }
 
@@ -166,12 +228,53 @@ namespace CG_Project_III
 
         private void CheckBox_Checked_AA(object sender, RoutedEventArgs e)
         {
-            antiAliasing = true;
+            MyBitmap.AntiAliasing = true;
+            MyBitmap.Redraw(shapes);
         }
 
         private void CheckBox_Unchecked_AA(object sender, RoutedEventArgs e)
         {
-            antiAliasing = false;
+            MyBitmap.AntiAliasing = false;
+            MyBitmap.Redraw(shapes);
+        }
+
+        private void Save_Click(object sender, RoutedEventArgs e)
+        {
+            FileStream fs = new FileStream("DataFile.dat", FileMode.Create);
+            BinaryFormatter formatter = new BinaryFormatter();
+            try
+            {
+                formatter.Serialize(fs, shapes);
+            }
+            catch (SerializationException error)
+            {
+                Console.WriteLine("Failed to serialize. Reason: " + error.Message);
+                throw;
+            }
+            finally
+            {
+                fs.Close();
+            }
+        }
+
+        private void Load_Click(object sender, RoutedEventArgs e)
+        {
+            FileStream fs = new FileStream("DataFile.dat", FileMode.Open);
+            try
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
+                shapes = (List<IShape>)formatter.Deserialize(fs);
+            }
+            catch (SerializationException error)
+            {
+                Console.WriteLine("Failed to deserialize. Reason: " + error.Message);
+                throw;
+            }
+            finally
+            {
+                fs.Close();
+            }
+            MyBitmap.Redraw(shapes);
         }
     }
 

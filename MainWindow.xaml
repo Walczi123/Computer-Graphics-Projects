@@ -8,7 +8,8 @@
         mc:Ignorable="d"
         Title="CG_Project_III" Height="430" Width="870" MinHeight="360" MinWidth="640"
         ContentRendered="Window_ContentRendered"
-    SizeChanged="Window_SizeChanged">
+        SizeChanged="Window_SizeChanged"
+        >
     <Grid x:Name="MyGrid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -35,7 +36,9 @@
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="30"/>
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="20"/>
@@ -45,26 +48,35 @@
             <Button x:Name="ButtonPoint" Grid.Row="1" Margin="5,5,5,5" Content="Point" Click="Point_Click" IsEnabled="False"/>
             <Button x:Name="ButtonLine" Grid.Row="2" Margin="5,5,5,5" Content="Line" Click="Line_Click" IsEnabled="True"/>
             <Button x:Name="ButtonCircle" Grid.Row="3" Margin="5,5,5,5" Content="Circle" Click="Circle_Click" IsEnabled="True"/>
-            <DockPanel Grid.Row="4">
+            <Button x:Name="ButtonPolygon" Grid.Row="4" Margin="5,5,5,5" Content="Polygon" Click="Polygon_Click" IsEnabled="True"/>
+            <DockPanel Grid.Row="5">
                 <TextBlock  Text="Thickness  " VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,5,0"/>
                 <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,5,0" Checked="CheckBox_Checked_Thickness" Unchecked="CheckBox_Unchecked_Thickness"/>
                 <ComboBox x:Name="ThicknessComboBox" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,5,0" Width="50"/>
             </DockPanel>
-            <DockPanel Grid.Row="5">
+            <DockPanel Grid.Row="6">
                 <TextBlock  Text="Anti-Aliasing" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10,0,5,0"/>
                 <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,5,0" Checked="CheckBox_Checked_AA" Unchecked="CheckBox_Unchecked_AA"/>
             </DockPanel>
-            <DockPanel Grid.Row="7">
+            <Grid Grid.Row="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button x:Name="ButtonSave" Grid.Column="0" Margin="5,5,5,5" Content="Save" Click="Save_Click" VerticalAlignment="Center" HorizontalAlignment="Center" Width="50"/>
+                <Button x:Name="ButtonLoad" Grid.Column="1" Margin="5,5,5,5" Content="Load" Click="Load_Click" VerticalAlignment="Center" HorizontalAlignment="Center" Width="50"/>
+            </Grid>
+            <DockPanel Grid.Row="9">
                 <TextBlock Text="1st  Color" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,5,0"/>
                 <xctk:ColorPicker Name="cp1" DisplayColorAndName="True" SelectedColorChanged="Selected_Color1" AvailableColorsSortingMode="HueSaturationBrightness" Margin="2,2,2,2" 
                                   SelectedColor="Black"/>
             </DockPanel>
-            <DockPanel Grid.Row="8">
+            <DockPanel Grid.Row="10">
                 <TextBlock Text="2nd Color" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,5,0"/>
                 <xctk:ColorPicker Name="cp2" DisplayColorAndName="True" SelectedColorChanged="Selected_Color2" AvailableColorsSortingMode="HueSaturationBrightness" Margin="2,2,2,2" 
                                   SelectedColor="#7F000000"/>
             </DockPanel>
-            <Grid Grid.Row="9">
+            <Grid Grid.Row="11">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
@@ -80,6 +92,6 @@
             </Grid>
         </Grid>
         <Image x:Name="image" Grid.Row="2" Stretch="Fill" 
-               MouseDown="Image_MouseDown" MouseMove="Image_MouseMove" MouseUp="Image_MouseUp"/>
+               MouseDown="Image_MouseDown" MouseMove="Image_MouseMove" MouseUp="Image_MouseUp" />
     </Grid>
 </Window>
