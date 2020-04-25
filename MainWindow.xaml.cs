@@ -39,6 +39,7 @@ namespace CG_Project_III
             image.Source = bitmap;
             MyBitmap.Bitmap = bitmap;
             MyBitmap.CleanDrawArea();
+            shapes = new List<IShape>() { };
             ThicknessComboBox.ItemsSource = Enumerable.Range(1, 30).Select(i => (object)i).ToArray();
         }
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -59,6 +60,7 @@ namespace CG_Project_III
         private void menu_clear(object sender, RoutedEventArgs e)
         {
             MyBitmap.CleanDrawArea();
+            shapes = new List<IShape>() { };
         }
         private void Image_MouseMove(object sender, MouseEventArgs e)
         {

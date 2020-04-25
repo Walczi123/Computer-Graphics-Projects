@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:CG_Project_III"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
-        Title="CG_Project_III" Height="440" Width="870" MinHeight="360" MinWidth="640"
+        Title="CG_Project_III" Height="440" Width="870" MinHeight="440" MinWidth="640"
         ContentRendered="Window_ContentRendered"
         SizeChanged="Window_SizeChanged"
         >
@@ -22,6 +22,8 @@
         <DockPanel Grid.Row="0" Grid.ColumnSpan="2">
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_Options" Height="25">
+                    <MenuItem Header="_Save" Click="Save_Click"/>
+                    <MenuItem Header="_Load" Click="Load_Click"/>
                     <MenuItem Header="_Clear" Click="menu_clear"/>
                     <Separator />
                     <MenuItem Header="_Exit" Click="menu_shutdown"/>
