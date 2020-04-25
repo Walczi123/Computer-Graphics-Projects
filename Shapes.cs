@@ -35,25 +35,56 @@ namespace CG_Project_III
             this.B = color.B;
         }
     }
-
-    public interface IShape
+    [Serializable]
+    public abstract class IShape
     {
-        Color FirstColor
+        protected int editSize = 10;
+        public Color FirstColor
         {
             set;
             get;
         }
-        void Draw();
+        public Color SecondColor
+        {
+            set;
+            get;
+        }
+        public HashSet<(int, int)> Pixels
+        {
+            set;
+            get;
+        }
+        protected int BrushSize;
+        public void ChangeBrushSize(int change)
+        {
+            if (BrushSize != -1)
+            {
+                BrushSize = change;
+                if (BrushSize < 0)
+                    BrushSize = 0;
+            }             
+        }
+        public int GetBrushSize()
+        {
+            return BrushSize;
+        }
+
+        public abstract void Draw();
+        public abstract void EditModeStart();
+        public abstract void EditModeStop();
+
     }
     [Serializable]
     public class Point : IShape
     {
+        private bool editMode = false;
         public Point() { }
         public Point(int x, int y)
         {
             this.X = x;
             this.Y = y;
             this.BrushSize = 0;
+            this.Pixels = null;
         }
         public Point(int x, int y, Color color1)
         {
@@ -61,6 +92,7 @@ namespace CG_Project_III
             this.Y = y;
             this.BrushSize = 0;
             this.FirstColor = color1;
+            this.Pixels = null;
         }
         public Point(int x, int y, int brushSize, Color color1)
         {
@@ -68,6 +100,7 @@ namespace CG_Project_III
             this.Y = y;
             this.BrushSize = brushSize;
             this.FirstColor = color1;
+            this.Pixels = null;
         }
         public int X
         {
@@ -79,24 +112,28 @@ namespace CG_Project_III
             get;
             set;
         }
-        public int BrushSize
+        public override void Draw()
         {
-            get;
-            set;
+            Pixels = MyBitmap.DrawPoint(X, Y, BrushSize, FirstColor);
+            if (editMode)
+            {
+                Pixels.UnionWith(MyBitmap.DrawPoint(X, Y, BrushSize + editSize, FirstColor));
+            }
         }
-        public Color FirstColor
+        public override void EditModeStart()
         {
-            set;
-            get;
+            editMode = true;
+            this.Draw();
         }
-        public void Draw()
+        public override void EditModeStop()
         {
-            MyBitmap.DrawPoint(X, Y, BrushSize, FirstColor);
+            editMode = false;
         }
     }
     [Serializable]
     public class Line : IShape
     {
+        private bool editMode = false;
         public Line(int x1, int y1, int x2, int y2, Color color1, Color color2)
         {
             this.X1 = x1;
@@ -106,6 +143,7 @@ namespace CG_Project_III
             this.BrushSize = 0;
             this.FirstColor = color1;
             this.SecondColor = color2;
+            this.Pixels = null;
         }
         public Line(int x1, int y1, int x2, int y2, int brushSize, Color color1, Color color2)
         {
@@ -116,6 +154,7 @@ namespace CG_Project_III
             this.BrushSize = brushSize;
             this.FirstColor = color1;
             this.SecondColor = color2;
+            this.Pixels = null;
         }
         public int X1
         {
@@ -137,37 +176,38 @@ namespace CG_Project_III
             get;
             set;
         }
-        public int BrushSize
+        public override void Draw()
         {
-            get;
-            set;
+            Pixels = MyBitmap.DrawLine(X1, Y1, X2, Y2, BrushSize, FirstColor, SecondColor);
+            if (editMode)
+            {
+                Pixels.UnionWith(MyBitmap.DrawPoint(X1, Y1, BrushSize + editSize, FirstColor));
+                Pixels.UnionWith(MyBitmap.DrawPoint(X2, Y2, BrushSize + editSize, FirstColor));
+            }
         }
-        public Color FirstColor
+        public override void EditModeStart()
         {
-            set;
-            get;
+            editMode = true;
+            this.Draw();
         }
-        public Color SecondColor
+        public override void EditModeStop()
         {
-            set;
-            get;
-        }
-
-        public void Draw()
-        {
-            MyBitmap.DrawLine(X1, Y1, X2, Y2, BrushSize, FirstColor, SecondColor);
+            editMode = false;
         }
     }
     [Serializable]
     public class Circle : IShape
     {
+        private bool editMode = false;
         public Circle(int x, int y, int r, Color color1, Color color2)
         {
             this.OriginX = x;
             this.OriginY = y;
             this.Radius = r;
+            this.BrushSize = -1;
             this.FirstColor = color1;
             this.SecondColor = color2;
+            this.Pixels = null;
         }
         public int OriginX
         {
@@ -184,31 +224,35 @@ namespace CG_Project_III
             get;
             set;
         }
-        public Color FirstColor
+        public override void Draw()
         {
-            set;
-            get;
+            Pixels = MyBitmap.DrawCircle(OriginX, OriginY, Radius, FirstColor, SecondColor);
+            if (editMode)
+            {
+                Pixels.UnionWith(MyBitmap.DrawPoint(OriginX, OriginY, editSize, FirstColor));
+            }
         }
-        public Color SecondColor
+        public override void EditModeStart()
         {
-            set;
-            get;
+            editMode = true;
+            this.Draw();
         }
-
-        public void Draw()
+        public override void EditModeStop()
         {
-            MyBitmap.DrawCircle(OriginX, OriginY, Radius, FirstColor, SecondColor);
+            editMode = false;
         }
     }
     [Serializable]
     public class Polygon : IShape
     {
+        private bool editMode = false;
         public Polygon(Color color1, Color color2)
         {
             this.Vertices = new List<Point>() { };
             this.FirstColor = color1;
             this.SecondColor = color2;
             this.BrushSize = 0;
+            this.Pixels = null;
         }
         public Polygon(int brushSize, Color color1, Color color2)
         {
@@ -216,6 +260,7 @@ namespace CG_Project_III
             this.FirstColor = color1;
             this.SecondColor = color2;
             this.BrushSize = brushSize;
+            this.Pixels = null;
         }
         public List<Point> Vertices
         {
@@ -226,31 +271,31 @@ namespace CG_Project_III
         {
             Vertices.Add(point);
         }
-
-        public void Draw()
+        public override void Draw()
         {
             int i;
-            for (i=0; i < Vertices.Count() - 1; i++)
+            Pixels = new HashSet<(int, int)>();
+            for (i = 0; i < Vertices.Count() - 1; i++)
             {
-                MyBitmap.DrawLine(Vertices[i].X, Vertices[i].Y, Vertices[i + 1].X, Vertices[i + 1].Y, BrushSize, FirstColor, SecondColor);
+                Pixels.UnionWith(MyBitmap.DrawLine(Vertices[i].X, Vertices[i].Y, Vertices[i + 1].X, Vertices[i + 1].Y, BrushSize, FirstColor, SecondColor));
+                if (editMode)
+                {
+                    Pixels.UnionWith(MyBitmap.DrawPoint(Vertices[i].X, Vertices[i].Y, editSize, FirstColor));
+                }
             }
-            MyBitmap.DrawLine(Vertices[0].X, Vertices[0].Y, Vertices[i].X, Vertices[i].Y, BrushSize, FirstColor, SecondColor);
-        }
+            Pixels.UnionWith(MyBitmap.DrawLine(Vertices[0].X, Vertices[0].Y, Vertices[i].X, Vertices[i].Y, BrushSize, FirstColor, SecondColor));
+            if (editMode)
+                Pixels.UnionWith(MyBitmap.DrawPoint(Vertices[i].X, Vertices[i].Y, editSize, FirstColor));
 
-        public int BrushSize
-        {
-            get;
-            set;
         }
-        public Color FirstColor
+        public override void EditModeStart()
         {
-            set;
-            get;
+            editMode = true;
+            this.Draw();
         }
-        public Color SecondColor
+        public override void EditModeStop()
         {
-            set;
-            get;
+            editMode = false;
         }
     }
 }

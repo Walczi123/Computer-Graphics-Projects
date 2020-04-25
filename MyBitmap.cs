@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace CG_Project_III
@@ -29,64 +28,94 @@ namespace CG_Project_III
             set;
         }
 
-        internal static void DrawPoint(int x, int y, int brushSize)
+        internal static HashSet<(int, int)> DrawPoint(int x, int y, int brushSize)
         {
+            HashSet<(int, int)> result;
+            Bitmap.Lock();
             if (brushSize > 0)
-                Algorithms.Brush(x, y, brushSize, FirstColor);
+                 result = Algorithms.Brush(x, y, brushSize, FirstColor);
             else
+            {
+                result = new HashSet<(int, int)>() { (x, y) };
                 MyBitmap.DrawPixel(x, y, FirstColor);
+            }              
+            Bitmap.Unlock();
+            return result;
         }
-        internal static void DrawLine(int x1, int y1, int x2, int y2, int brushSize)
+        internal static HashSet<(int, int)> DrawPoint(int x, int y, int brushSize, Color col)
         {
+            HashSet<(int, int)> result;
+            Bitmap.Lock();
+            if (brushSize > 0)
+                result = Algorithms.Brush(x, y, brushSize, col);
+            else
+            {
+                result = new HashSet<(int, int)>() { (x, y) };
+                MyBitmap.DrawPixel(x, y, col);
+            }             
+            Bitmap.Unlock();
+            return result;
+        }
+        internal static HashSet<(int, int)> DrawLine(int x1, int y1, int x2, int y2, int brushSize)
+        {
+            HashSet<(int, int)> result;
+            Bitmap.Lock();
             if (AntiAliasing)
             {
-                Algorithms.WuLine(x1, y1, x2, y2, FirstColor, SecondColor);
+                result = Algorithms.WuLine(x1, y1, x2, y2, FirstColor, SecondColor);
             }
             else
             {
-                Algorithms.lineDDA(x1, y1, x2, y2, FirstColor, brushSize);
+                result = Algorithms.lineDDA(x1, y1, x2, y2, FirstColor, brushSize);
             }
+            Bitmap.Unlock();
+            return result;
         }
-        internal static void DrawCircle(int origin_x, int origin_y, int R)
+        internal static HashSet<(int, int)> DrawCircle(int origin_x, int origin_y, int R)
         {
+            HashSet<(int, int)> result;
+            Bitmap.Lock();
             if (AntiAliasing)
             {
-                Algorithms.WuCircle(origin_x, origin_y, R, FirstColor, SecondColor);
+                result = Algorithms.WuCircle(origin_x, origin_y, R, FirstColor, SecondColor);
             }
             else
             {
-                Algorithms.MidpointCircle(origin_x, origin_y, R, FirstColor);
+                result = Algorithms.MidpointCircle(origin_x, origin_y, R, FirstColor);
             }
+            Bitmap.Unlock();
+            return result;
         }
 
-        internal static void DrawPoint(int x, int y, int brushSize, Color col)
+        internal static HashSet<(int, int)> DrawLine(int x1, int y1, int x2, int y2, int brushSize, Color col1, Color col2)
         {
-            if (brushSize > 0)
-                Algorithms.Brush(x, y, brushSize, col);
-            else
-                MyBitmap.DrawPixel(x, y, col);
-        }
-        internal static void DrawLine(int x1, int y1, int x2, int y2, int brushSize, Color col1, Color col2)
-        {
+            HashSet<(int, int)> result;
+            Bitmap.Lock();
             if (AntiAliasing)
             {
-                Algorithms.WuLine(x1, y1, x2, y2, col1, col2);
+                result = Algorithms.WuLine(x1, y1, x2, y2, col1, col2);
             }
             else
             {
-                Algorithms.lineDDA(x1, y1, x2, y2, col1, brushSize);
+                result = Algorithms.lineDDA(x1, y1, x2, y2, col1, brushSize);
             }
+            Bitmap.Unlock();
+            return result;
         }
-        internal static void DrawCircle(int origin_x, int origin_y, int R, Color col1, Color col2)
+        internal static HashSet<(int, int)> DrawCircle(int origin_x, int origin_y, int R, Color col1, Color col2)
         {
+            HashSet<(int, int)> result;
+            Bitmap.Lock();
             if (AntiAliasing)
             {
-                Algorithms.WuCircle(origin_x, origin_y, R, col1, col2);
+                result = Algorithms.WuCircle(origin_x, origin_y, R, col1, col2);
             }
             else
             {
-                Algorithms.MidpointCircle(origin_x, origin_y, R, col1);
+                result = Algorithms.MidpointCircle(origin_x, origin_y, R, col1);
             }
+            Bitmap.Unlock();
+            return result;
         }
 
 
@@ -94,54 +123,38 @@ namespace CG_Project_III
         {
             if (x < 0 || y < 0 || x >= Bitmap.PixelWidth || y >= Bitmap.PixelHeight)
                 return;
-            try
+            unsafe
             {
-                Bitmap.Lock();
-                unsafe
-                {
-                    IntPtr pBackBuffer = Bitmap.BackBuffer + y * Bitmap.BackBufferStride + x * 4;
+                IntPtr pBackBuffer = Bitmap.BackBuffer + y * Bitmap.BackBufferStride + x * 4;
 
-                    int color_data = 0;
-                    color_data |= color.A << 24;    // A
-                    color_data |= color.R << 16;    // R
-                    color_data |= color.G << 8;     // G
-                    color_data |= color.B << 0;     // B
+                int color_data = 0;
+                color_data |= color.A << 24;    // A
+                color_data |= color.R << 16;    // R
+                color_data |= color.G << 8;     // G
+                color_data |= color.B << 0;     // B
 
-                    *((int*)pBackBuffer) = color_data;
-                }
-                Bitmap.AddDirtyRect(new Int32Rect(x, y, 1, 1));
+                *((int*)pBackBuffer) = color_data;
             }
-            finally
-            {
-                Bitmap.Unlock();
-            }
+            Bitmap.AddDirtyRect(new Int32Rect(x, y, 1, 1));
         }
 
         internal static void DrawPixel(int x, int y, System.Windows.Media.Color color)
         {
             if (x < 0 || y < 0 || x >= Bitmap.PixelWidth || y >= Bitmap.PixelHeight)
                 return;
-            try
+            unsafe
             {
-                Bitmap.Lock();
-                unsafe
-                {
-                    IntPtr pBackBuffer = Bitmap.BackBuffer + y * Bitmap.BackBufferStride + x * 4;
+                IntPtr pBackBuffer = Bitmap.BackBuffer + y * Bitmap.BackBufferStride + x * 4;
 
-                    int color_data = 0;
-                    color_data |= color.A << 24;    // A
-                    color_data |= color.R << 16;    // R
-                    color_data |= color.G << 8;     // G
-                    color_data |= color.B << 0;     // B
+                int color_data = 0;
+                color_data |= color.A << 24;    // A
+                color_data |= color.R << 16;    // R
+                color_data |= color.G << 8;     // G
+                color_data |= color.B << 0;     // B
 
-                    *((int*)pBackBuffer) = color_data;
-                }
-                Bitmap.AddDirtyRect(new Int32Rect(x, y, 1, 1));
+                *((int*)pBackBuffer) = color_data;
             }
-            finally
-            {
-                Bitmap.Unlock();
-            }
+            Bitmap.AddDirtyRect(new Int32Rect(x, y, 1, 1));
         }
 
         internal static void CleanDrawArea()
@@ -181,6 +194,42 @@ namespace CG_Project_III
             MyBitmap.CleanDrawArea();
             foreach (var shape in shapes)
                 shape.Draw();
+        }
+
+        internal static IShape FindShape(List<IShape> shapes, int x, int y)
+        {
+            int searchArea = 5, distance = searchArea;
+            IShape result = null;
+            foreach (var shape in shapes)
+            {
+                if (shape.Pixels != null)
+                {
+                    foreach(var pixel in shape.Pixels)
+                    {
+                        for (int i = 0; i < searchArea; i++)
+                        {
+                            for (int j = 0; j < searchArea; j++)
+                            {
+                                int d = (int)Math.Sqrt(Math.Pow( pixel.Item1 - x , 2) + Math.Pow(pixel.Item2 - y, 2));
+                                if ( d < distance)
+                                {
+                                    distance = d;
+                                    result = shape;
+                                    if ( d == 0)
+                                    {
+                                        return result;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }            
+            return result;
+        }
+        internal static double PointDistance(int x1, int y1, int x2, int y2)
+        {
+            return Math.Sqrt(Math.Pow(x1 - x2, 2) + Math.Pow(y1-y2, 2));
         }
     }
 }

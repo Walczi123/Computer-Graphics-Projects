@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -23,6 +24,7 @@ namespace CG_Project_III
         private Point lastPosition = new Point();
         private Point firstPosition = new Point();
         private Polygon CurrentPolygon = null;
+        private IShape CurrentEditableShape = null;
         private List<IShape> shapes = new List<IShape>() { };
         public MainWindow()
         {
@@ -37,13 +39,13 @@ namespace CG_Project_III
             image.Source = bitmap;
             MyBitmap.Bitmap = bitmap;
             MyBitmap.CleanDrawArea();
-            ThicknessComboBox.ItemsSource= Enumerable.Range(2, 49).Select(i => (object)i).ToArray();
+            ThicknessComboBox.ItemsSource = Enumerable.Range(1, 30).Select(i => (object)i).ToArray();
         }
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             if ((int)image.ActualWidth > 0 && (int)image.ActualHeight > 0)
             {
-                this.bitmap = new WriteableBitmap((int)image.ActualWidth + 1, (int)image.ActualHeight + 1, 96, 96, System.Windows.Media.PixelFormats.Bgra32, null);               
+                this.bitmap = new WriteableBitmap((int)image.ActualWidth + 1, (int)image.ActualHeight + 1, 96, 96, System.Windows.Media.PixelFormats.Bgra32, null);
                 image.Source = bitmap;
                 MyBitmap.Bitmap = bitmap;
                 MyBitmap.Redraw(shapes);
@@ -57,7 +59,7 @@ namespace CG_Project_III
         private void menu_clear(object sender, RoutedEventArgs e)
         {
             MyBitmap.CleanDrawArea();
-        }     
+        }
         private void Image_MouseMove(object sender, MouseEventArgs e)
         {
             var position = Mouse.GetPosition(image);
@@ -66,7 +68,7 @@ namespace CG_Project_III
         }
         private void Image_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if(current_drawing != 3)
+            if (current_drawing != 3)
             {
                 lastPosition.X = (int)e.GetPosition(image).X;
                 lastPosition.Y = (int)e.GetPosition(image).Y;
@@ -83,46 +85,50 @@ namespace CG_Project_III
                     if (thickness && ThicknessComboBox.SelectedItem != null)
                     {
                         var brushSize = Int32.Parse(ThicknessComboBox.SelectedItem.ToString());
-                        MyBitmap.DrawPoint(x, y, brushSize);
-                        shapes.Add(new Point(x, y, brushSize, MyBitmap.FirstColor));
+                        var p = new Point(x, y, brushSize, MyBitmap.FirstColor);
+                        p.Draw();
+                        shapes.Add(p);
                     }
                     else
                     {
-                        MyBitmap.DrawPoint(x, y, 0);
-                        shapes.Add(new Point(x, y, MyBitmap.FirstColor));
+                        var p = new Point(x, y, 0, MyBitmap.FirstColor);
+                        p.Draw();
+                        shapes.Add(p);
                     }
                     break;
                 case 1:
                     if (thickness && ThicknessComboBox.SelectedItem != null)
                     {
                         var brushSize = Int32.Parse(ThicknessComboBox.SelectedItem.ToString());
-                        MyBitmap.DrawLine(lastPosition.X, lastPosition.Y, x, y, brushSize);
-                        shapes.Add(new Line(lastPosition.X, lastPosition.Y, x, y, brushSize, MyBitmap.FirstColor, MyBitmap.SecondColor));
+                        var l = new Line(lastPosition.X, lastPosition.Y, x, y, brushSize, MyBitmap.FirstColor, MyBitmap.SecondColor);
+                        l.Draw();
+                        shapes.Add(l);
                     }
                     else
                     {
-                        shapes.Add(new Line(lastPosition.X, lastPosition.Y, x, y, MyBitmap.FirstColor, MyBitmap.SecondColor));
-                        MyBitmap.DrawLine(lastPosition.X, lastPosition.Y, x, y, 0);
-                    }                                        
+                        var l = new Line(lastPosition.X, lastPosition.Y, x, y, MyBitmap.FirstColor, MyBitmap.SecondColor);
+                        l.Draw();
+                        shapes.Add(l);
+                    }
                     break;
                 case 2:
                     int R = (int)Math.Sqrt(Math.Pow(x - lastPosition.X, 2) + Math.Pow(y - lastPosition.Y, 2));
-                    MyBitmap.DrawCircle(lastPosition.X, lastPosition.Y, R);
-                    shapes.Add(new Circle(lastPosition.X, lastPosition.Y, R, MyBitmap.FirstColor, MyBitmap.SecondColor));
+                    var c = new Circle(lastPosition.X, lastPosition.Y, R, MyBitmap.FirstColor, MyBitmap.SecondColor);
+                    c.Draw();
+                    shapes.Add(c);
                     break;
                 case 3:
                     if (!firstClick)
                     {
                         firstPosition.X = x;
-                        firstPosition.Y = y;     
+                        firstPosition.Y = y;
                         lastPosition.X = x;
                         lastPosition.Y = y;
-                                               
                         if (thickness && ThicknessComboBox.SelectedItem != null)
                         {
                             var brushSize = Int32.Parse(ThicknessComboBox.SelectedItem.ToString());
                             MyBitmap.DrawPoint(x, y, brushSize);
-                            CurrentPolygon =  new Polygon(brushSize, MyBitmap.FirstColor, MyBitmap.SecondColor);
+                            CurrentPolygon = new Polygon(brushSize, MyBitmap.FirstColor, MyBitmap.SecondColor);
                             CurrentPolygon.Add(new Point(x, y));
                         }
                         else
@@ -135,25 +141,122 @@ namespace CG_Project_III
                     }
                     else
                     {
-                        var d = Math.Sqrt(Math.Pow(x - firstPosition.X, 2) + Math.Pow(y - firstPosition.Y,2));
-                        if (d < 10)
+                        var d = Math.Sqrt(Math.Pow(x - firstPosition.X, 2) + Math.Pow(y - firstPosition.Y, 2));
+                        if (d < 5)
                         {
-                            MyBitmap.DrawLine(lastPosition.X, lastPosition.Y, firstPosition.X, firstPosition.Y, CurrentPolygon.BrushSize);
+                            MyBitmap.DrawLine(lastPosition.X, lastPosition.Y, firstPosition.X, firstPosition.Y, CurrentPolygon.GetBrushSize());
+                            CurrentPolygon.Draw();
                             this.shapes.Add(CurrentPolygon);
                             CurrentPolygon = null;
                             firstClick = !firstClick;
+                            //lastPosition = new Point();
+                            //firstPosition = new Point();
                         }
                         else
                         {
-                            MyBitmap.DrawLine(lastPosition.X, lastPosition.Y, x, y, CurrentPolygon.BrushSize);
+                            MyBitmap.DrawLine(lastPosition.X, lastPosition.Y, x, y, CurrentPolygon.GetBrushSize());
                             lastPosition.X = x;
                             lastPosition.Y = y;
                             CurrentPolygon.Add(new Point(x, y));
                         }
-                    }                   
+                    }
+                    break;
+                case 4:
+                    var edit = MyBitmap.FindShape(shapes, x, y);
+                    var edit2 = MyBitmap.FindShape(shapes, lastPosition.X, lastPosition.Y);
+                    if (CurrentEditableShape != null && edit2 == CurrentEditableShape)
+                    {
+                        if (CurrentEditableShape is Point)
+                        {
+                            //MessageBox.Show("Point");
+                            var p = CurrentEditableShape as Point;
+                            p.X = x;
+                            p.Y = y;
+                            MyBitmap.Redraw(shapes);
+                        }
+                        else if (CurrentEditableShape is Circle)
+                        {
+                            //MessageBox.Show("Circle");
+                            var cir= CurrentEditableShape as Circle;
+                            var d = MyBitmap.PointDistance(cir.OriginX, cir.OriginY, lastPosition.X, lastPosition.Y);
+                            if (d < 10)
+                            {
+                                cir.OriginX = x;
+                                cir.OriginY = y;
+                                MyBitmap.Redraw(shapes);
+                            }
+                            else
+                            {
+                                var r = MyBitmap.PointDistance(cir.OriginX, cir.OriginY, x, y);
+                                cir.Radius = (int)r;
+                                MyBitmap.Redraw(shapes);
+                            }
+                        }
+                        else if (CurrentEditableShape is Line)
+                        {
+                            //MessageBox.Show("Line");
+                            var l = CurrentEditableShape as Line;
+                            var d1 = MyBitmap.PointDistance(l.X1, l.Y1, lastPosition.X, lastPosition.Y);
+                            var d2 = MyBitmap.PointDistance(l.X2, l.Y2, lastPosition.X, lastPosition.Y);
+                            if (d1 < 10)
+                            {
+                                l.X1 = x;
+                                l.Y1 = y;
+                                MyBitmap.Redraw(shapes);
+                            }
+                            else if (d2 < 10)
+                            {
+                                l.X2 = x;
+                                l.Y2 = y;
+                                MyBitmap.Redraw(shapes);
+                            }
+                        }
+                        else if (CurrentEditableShape is Polygon)
+                        {
+                            //MessageBox.Show("Polygon");
+                            var pol = CurrentEditableShape as Polygon;
+                            for(int i=0; i<pol.Vertices.Count;i++)
+                            {
+                                var d = MyBitmap.PointDistance(pol.Vertices[i].X, pol.Vertices[i].Y, lastPosition.X, lastPosition.Y);
+                                if (d < 10)
+                                {
+                                    pol.Vertices[i].X = x;
+                                    pol.Vertices[i].Y = y;
+                                    MyBitmap.Redraw(shapes);
+                                }
+                            }
+                        }
+                    }
+                    if (edit != null)
+                    {
+                        if (CurrentEditableShape != null)
+                        {      
+                            if (CurrentEditableShape != edit)
+                            {
+                                CurrentEditableShape.EditModeStop();
+                                CurrentEditableShape = edit;
+                                CurrentEditableShape.EditModeStart();
+                                MyBitmap.Redraw(shapes);
+                            }   
+                        }                  
+                        else
+                        {
+                            CurrentEditableShape = edit;
+                            CurrentEditableShape.EditModeStart();
+                            MyBitmap.Redraw(shapes);
+                        }
+                    }
+                    break;
+                case 5:
+                    var del = MyBitmap.FindShape(shapes, x, y);
+                    if (del != null)
+                    {
+                        shapes.Remove(del);
+                        MyBitmap.Redraw(shapes);
+                    }
                     break;
             }
-                 
+
         }
 
         private void Point_Click(object sender, RoutedEventArgs e)
@@ -163,6 +266,15 @@ namespace CG_Project_III
             ButtonLine.IsEnabled = true;
             ButtonCircle.IsEnabled = true;
             ButtonPolygon.IsEnabled = true;
+            ButtonEdit.IsEnabled = true;
+            ButtonDelete.IsEnabled = true;
+            if(CurrentEditableShape != null)
+            {
+                CurrentEditableShape.EditModeStop();
+                CurrentEditableShape = null;
+                MyBitmap.Redraw(shapes);
+            }
+
         }
         private void Line_Click(object sender, RoutedEventArgs e)
         {
@@ -171,7 +283,15 @@ namespace CG_Project_III
             ButtonLine.IsEnabled = false;
             ButtonCircle.IsEnabled = true;
             ButtonPolygon.IsEnabled = true;
-        }        
+            ButtonEdit.IsEnabled = true;
+            ButtonDelete.IsEnabled = true;
+            if (CurrentEditableShape != null)
+            {
+                CurrentEditableShape.EditModeStop();
+                CurrentEditableShape = null;
+                MyBitmap.Redraw(shapes);
+            }
+        }
         private void Circle_Click(object sender, RoutedEventArgs e)
         {
             current_drawing = 2;
@@ -179,7 +299,15 @@ namespace CG_Project_III
             ButtonLine.IsEnabled = true;
             ButtonCircle.IsEnabled = false;
             ButtonPolygon.IsEnabled = true;
-        }        
+            ButtonEdit.IsEnabled = true;
+            ButtonDelete.IsEnabled = true;
+            if (CurrentEditableShape != null)
+            {
+                CurrentEditableShape.EditModeStop();
+                CurrentEditableShape = null;
+                MyBitmap.Redraw(shapes);
+            }
+        }
         private void Polygon_Click(object sender, RoutedEventArgs e)
         {
             current_drawing = 3;
@@ -187,6 +315,46 @@ namespace CG_Project_III
             ButtonLine.IsEnabled = true;
             ButtonCircle.IsEnabled = true;
             ButtonPolygon.IsEnabled = false;
+            ButtonEdit.IsEnabled = true;
+            ButtonDelete.IsEnabled = true;
+            if (CurrentEditableShape != null)
+            {
+                CurrentEditableShape.EditModeStop();
+                CurrentEditableShape = null;
+                MyBitmap.Redraw(shapes);
+            }
+        }
+        private void Edit_Click(object sender, RoutedEventArgs e)
+        {
+            current_drawing = 4;
+            ButtonPoint.IsEnabled = true;
+            ButtonLine.IsEnabled = true;
+            ButtonCircle.IsEnabled = true;
+            ButtonPolygon.IsEnabled = true;
+            ButtonEdit.IsEnabled = false;
+            ButtonDelete.IsEnabled = true;
+            if (CurrentEditableShape != null)
+            {
+                CurrentEditableShape.EditModeStop();
+                CurrentEditableShape = null;
+                MyBitmap.Redraw(shapes);
+            }
+        }
+        private void Delete_Click(object sender, RoutedEventArgs e)
+        {
+            current_drawing = 5;
+            ButtonPoint.IsEnabled = true;
+            ButtonLine.IsEnabled = true;
+            ButtonCircle.IsEnabled = true;
+            ButtonPolygon.IsEnabled = true;
+            ButtonEdit.IsEnabled = true;
+            ButtonDelete.IsEnabled = false;
+            if (CurrentEditableShape != null)
+            {
+                CurrentEditableShape.EditModeStop();
+                CurrentEditableShape = null;
+                MyBitmap.Redraw(shapes);
+            }
         }
         private void Selected_Color1(object sender, RoutedPropertyChangedEventArgs<System.Windows.Media.Color?> e)
         {
@@ -198,7 +366,12 @@ namespace CG_Project_III
                 {
                     cp2.SelectedColor = System.Windows.Media.Color.FromArgb(127, (byte)mainColor.R, (byte)mainColor.G, (byte)mainColor.B);
                     MyBitmap.SecondColor = new Color(cp2.SelectedColor.Value);
-                }             
+                }
+            }
+            if (CurrentEditableShape != null)
+            {
+                CurrentEditableShape.FirstColor = MyBitmap.FirstColor;
+                CurrentEditableShape.Draw();
             }
         }
 
@@ -208,17 +381,31 @@ namespace CG_Project_III
             {
                 MyBitmap.SecondColor = new Color(cp2.SelectedColor.Value);
             }
+            if (CurrentEditableShape?.SecondColor != null)
+            {
+                CurrentEditableShape.SecondColor = MyBitmap.FirstColor;
+                CurrentEditableShape.Draw();
+            }
         }
-
-        private void OnlyNumbersValidationTextBox(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        private void ThicknessComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
-            Regex regex = new Regex("^[0-9]$");
-            e.Handled = !regex.IsMatch(e.Text);
+            if (CurrentEditableShape != null && ThicknessComboBox.SelectedItem != null)
+            {
+                var brushSize = Int32.Parse(ThicknessComboBox.SelectedItem.ToString());
+                CurrentEditableShape.ChangeBrushSize(brushSize);
+                MyBitmap.Redraw(shapes);
+            }
         }
 
         private void CheckBox_Checked_Thickness(object sender, RoutedEventArgs e)
         {
             thickness = true;
+            if (CurrentEditableShape != null && ThicknessComboBox.SelectedItem != null)
+            {
+                var brushSize = Int32.Parse(ThicknessComboBox.SelectedItem.ToString());
+                CurrentEditableShape.ChangeBrushSize(brushSize);
+                MyBitmap.Redraw(shapes);
+            }
         }
 
         private void CheckBox_Unchecked_Thickness(object sender, RoutedEventArgs e)
@@ -240,111 +427,53 @@ namespace CG_Project_III
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            FileStream fs = new FileStream("DataFile.dat", FileMode.Create);
-            BinaryFormatter formatter = new BinaryFormatter();
-            try
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+            saveFileDialog1.Filter = "My Image data|*.dat";
+            saveFileDialog1.Title = "Save an image";
+            saveFileDialog1.ShowDialog();
+            if (saveFileDialog1.FileName != "")
             {
-                formatter.Serialize(fs, shapes);
-            }
-            catch (SerializationException error)
-            {
-                Console.WriteLine("Failed to serialize. Reason: " + error.Message);
-                throw;
-            }
-            finally
-            {
-                fs.Close();
+                System.IO.FileStream fs =(System.IO.FileStream)saveFileDialog1.OpenFile();
+                BinaryFormatter formatter = new BinaryFormatter();
+                try
+                {
+                    if(shapes != null)
+                        formatter.Serialize(fs, shapes);
+                }
+                catch (SerializationException error)
+                {
+                    MessageBox.Show("Saving return SerializationException " + error.Message, "Eroor");
+                }
+                finally
+                {
+                    fs.Close();
+                }
             }
         }
 
         private void Load_Click(object sender, RoutedEventArgs e)
         {
-            FileStream fs = new FileStream("DataFile.dat", FileMode.Open);
-            try
+            OpenFileDialog op = new OpenFileDialog();
+            op.Title = "Select a picture";
+            op.Filter = "My graphics|*.dat;";
+            if (op.ShowDialog() == true)
             {
-                BinaryFormatter formatter = new BinaryFormatter();
-                shapes = (List<IShape>)formatter.Deserialize(fs);
+                FileStream fs = new FileStream(op.FileName, FileMode.Open);
+                try
+                {
+                    BinaryFormatter formatter = new BinaryFormatter();
+                    shapes = (List<IShape>)formatter.Deserialize(fs);
+                }
+                catch (SerializationException error)
+                {
+                    MessageBox.Show("Loading return SerializationException " + error.Message, "Eroor");
+                }
+                finally
+                {
+                    fs.Close();
+                }
+                MyBitmap.Redraw(shapes);
             }
-            catch (SerializationException error)
-            {
-                Console.WriteLine("Failed to deserialize. Reason: " + error.Message);
-                throw;
-            }
-            finally
-            {
-                fs.Close();
-            }
-            MyBitmap.Redraw(shapes);
         }
     }
-
-    //public static class RewritableBitmap
-    //{
-    //    public static WriteableBitmap ResizeWritableBitmap(this WriteableBitmap wBitmap, int reqWidth, int reqHeight)
-    //    {
-    //        int Stride = wBitmap.PixelWidth * ((wBitmap.Format.BitsPerPixel + 7) / 8);
-    //        int NumPixels = Stride * wBitmap.PixelHeight;
-    //        ushort[] ArrayOfPixels = new ushort[NumPixels];
-
-
-    //        wBitmap.CopyPixels(ArrayOfPixels, Stride, 0);
-
-    //        int OriWidth = (int)wBitmap.PixelWidth;
-    //        int OriHeight = (int)wBitmap.PixelHeight;
-
-    //        double nXFactor = (double)OriWidth / (double)reqWidth;
-    //        double nYFactor = (double)OriHeight / (double)reqHeight;
-
-    //        double fraction_x, fraction_y, one_minus_x, one_minus_y;
-    //        int ceil_x, ceil_y, floor_x, floor_y;
-
-    //        ushort pix1, pix2, pix3, pix4;
-    //        int nStride = reqWidth * ((wBitmap.Format.BitsPerPixel + 7) / 8);
-    //        int nNumPixels = reqWidth * reqHeight;
-    //        ushort[] newArrayOfPixels = new ushort[nNumPixels];
-    //        /*Core Part*/
-    //        /* Code project article :
-    //Image Processing for Dummies with C# and GDI+ Part 2 - Convolution Filters By Christian Graus</a>
-
-    //        href=<a href="http://www.codeproject.com/KB/GDI-plus/csharpfilters.aspx"></a>
-    //        */
-    //        for (int y = 0; y < reqHeight; y++)
-    //        {
-    //            for (int x = 0; x < reqWidth; x++)
-    //            {
-    //                // Setup
-    //                floor_x = (int)Math.Floor(x * nXFactor);
-    //                floor_y = (int)Math.Floor(y * nYFactor);
-
-    //                ceil_x = floor_x + 1;
-    //                if (ceil_x >= OriWidth) ceil_x = floor_x;
-
-    //                ceil_y = floor_y + 1;
-    //                if (ceil_y >= OriHeight) ceil_y = floor_y;
-
-    //                fraction_x = x * nXFactor - floor_x;
-    //                fraction_y = y * nYFactor - floor_y;
-
-    //                one_minus_x = 1.0 - fraction_x;
-    //                one_minus_y = 1.0 - fraction_y;
-
-    //                pix1 = ArrayOfPixels[floor_x + floor_y * OriWidth];
-    //                pix2 = ArrayOfPixels[ceil_x + floor_y * OriWidth];
-    //                pix3 = ArrayOfPixels[floor_x + ceil_y * OriWidth];
-    //                pix4 = ArrayOfPixels[ceil_x + ceil_y * OriWidth];
-
-    //                ushort g1 = (ushort)(one_minus_x * pix1 + fraction_x * pix2);
-    //                ushort g2 = (ushort)(one_minus_x * pix3 + fraction_x * pix4);
-    //                ushort g = (ushort)(one_minus_y * (double)(g1) + fraction_y * (double)(g2));
-    //                newArrayOfPixels[y * reqWidth + x] = g;
-    //            }
-    //        }
-    //        /*End of Core Part*/
-    //        WriteableBitmap newWBitmap = new WriteableBitmap(reqWidth, reqHeight, 96, 96, PixelFormats.Gray16, null);
-    //        Int32Rect Imagerect = new Int32Rect(0, 0, reqWidth, reqHeight);
-    //        int newStride = reqWidth * ((PixelFormats.Gray16.BitsPerPixel + 7) / 8);
-    //        newWBitmap.WritePixels(Imagerect, newArrayOfPixels, newStride, 0);
-    //        return newWBitmap;
-    //    }
-    //}
 }
