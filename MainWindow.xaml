@@ -20,7 +20,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0" Grid.ColumnSpan="2">
-            <Menu DockPanel.Dock="Top">
+            <Menu DockPanel.Dock="Top" Background="LightGray">
                 <MenuItem Header="_Options" Height="25">
                     <MenuItem Header="_Save" Click="Save_Click"/>
                     <MenuItem Header="_Load" Click="Load_Click"/>
