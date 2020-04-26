@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Controls;
 
 namespace CG_Project_III
 {
@@ -285,8 +286,12 @@ namespace CG_Project_III
             }
             Pixels.UnionWith(MyBitmap.DrawLine(Vertices[0].X, Vertices[0].Y, Vertices[i].X, Vertices[i].Y, BrushSize, FirstColor, SecondColor));
             if (editMode)
+            {
                 Pixels.UnionWith(MyBitmap.DrawPoint(Vertices[i].X, Vertices[i].Y, editSize, FirstColor));
-
+                var xy = this.Center();
+                Pixels.UnionWith(MyBitmap.DrawPoint(xy.Item1, xy.Item2, editSize, FirstColor));
+            }
+             
         }
         public override void EditModeStart()
         {
@@ -296,6 +301,42 @@ namespace CG_Project_III
         public override void EditModeStop()
         {
             editMode = false;
+        }
+        public (int,int) Center()
+        {
+            int sum_x = 0, sum_y = 0;
+           foreach( var vertex in Vertices)
+           {
+                sum_x += vertex.X;
+                sum_y += vertex.Y;
+           }
+            sum_x /= Vertices.Count();
+            sum_y /= Vertices.Count();
+            return (sum_x, sum_y);
+        }
+        public (int,int) WhichLine(int x, int y)
+        {
+            int i;
+            for (i = 0; i < Vertices.Count() - 1; i++)
+            {
+                var set = MyBitmap.DrawLine(Vertices[i].X, Vertices[i].Y, Vertices[i + 1].X, Vertices[i + 1].Y, BrushSize, FirstColor, SecondColor);
+                foreach( var element in set)
+                {
+                    if (MyBitmap.PointDistance(element.Item1, element.Item2, x, y) < 5)
+                    {
+                        return (i, i + 1);
+                    }
+                }    
+            }
+            var set2 = MyBitmap.DrawLine(Vertices[0].X, Vertices[0].Y, Vertices[i].X, Vertices[i].Y, BrushSize, FirstColor, SecondColor);
+            foreach (var element in set2)
+            {
+                if (MyBitmap.PointDistance(element.Item1, element.Item2, x, y) < 5)
+                {
+                    return (0, i );
+                }
+            }
+            return (-1, -1);
         }
     }
 }

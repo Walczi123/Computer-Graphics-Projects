@@ -217,7 +217,20 @@ namespace CG_Project_III
                         {
                             //MessageBox.Show("Polygon");
                             var pol = CurrentEditableShape as Polygon;
-                            for(int i=0; i<pol.Vertices.Count;i++)
+                            var center = pol.Center();
+                            if(MyBitmap.PointDistance(center.Item1, center.Item2, lastPosition.X, lastPosition.Y) < 10)
+                            {
+                                var dx = lastPosition.X - x;
+                                var dy = lastPosition.Y - y;
+                                foreach ( var vert in pol.Vertices)
+                                {
+                                    vert.X -= dx;
+                                    vert.Y -= dy;
+                                }
+                                MyBitmap.Redraw(shapes);
+                                break;
+                            }
+                            for (int i=0; i<pol.Vertices.Count;i++)
                             {
                                 var d = MyBitmap.PointDistance(pol.Vertices[i].X, pol.Vertices[i].Y, lastPosition.X, lastPosition.Y);
                                 if (d < 10)
@@ -225,7 +238,19 @@ namespace CG_Project_III
                                     pol.Vertices[i].X = x;
                                     pol.Vertices[i].Y = y;
                                     MyBitmap.Redraw(shapes);
+                                    break;
                                 }
+                            }
+                            var line = pol.WhichLine(lastPosition.X, lastPosition.Y);
+                            if(line.Item1 != -1)
+                            {
+                                //MessageBox.Show("Line");
+                                pol.Vertices[line.Item1].X -= lastPosition.X - x;
+                                pol.Vertices[line.Item1].Y -= lastPosition.Y - y;   
+                                pol.Vertices[line.Item2].X -= lastPosition.X - x;
+                                pol.Vertices[line.Item2].Y -= lastPosition.Y - y;
+                                MyBitmap.Redraw(shapes);
+                                break;
                             }
                         }
                     }
