@@ -118,6 +118,14 @@ namespace CG_Project_III
             return result;
         }
 
+        internal static HashSet<(int, int)> DrawCapsule(int x1, int y1, int x2, int y2, int x3, int y3, Color col1)
+        {
+            Bitmap.Lock();
+            var result = Algorithms.Capsule(x1, y1, x2, y2, x3, y3, col1);
+            Bitmap.Unlock();
+            return result;
+        }
+
 
         internal static void DrawPixel(int x, int y, Color color)
         {

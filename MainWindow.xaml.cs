@@ -70,7 +70,7 @@ namespace CG_Project_III
         }
         private void Image_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (current_drawing != 3)
+            if (current_drawing != 3 && current_drawing != 6)
             {
                 lastPosition.X = (int)e.GetPosition(image).X;
                 lastPosition.Y = (int)e.GetPosition(image).Y;
@@ -282,6 +282,21 @@ namespace CG_Project_III
                         MyBitmap.Redraw(shapes);
                     }
                     break;
+                case 6:
+                    if (firstPosition == null)
+                    {
+                        firstPosition = new Point(x, y);
+                    }else if (lastPosition == null)
+                    {
+                        lastPosition = new Point(x, y);
+                    }
+                    else
+                    {
+                        MyBitmap.DrawCapsule(firstPosition.X, firstPosition.Y, lastPosition.X, lastPosition.Y, x, y, MyBitmap.FirstColor);
+                        firstPosition = null;
+                        lastPosition = null;
+                    }
+                    break;
             }
 
         }
@@ -295,7 +310,8 @@ namespace CG_Project_III
             ButtonPolygon.IsEnabled = true;
             ButtonEdit.IsEnabled = true;
             ButtonDelete.IsEnabled = true;
-            if(CurrentEditableShape != null)
+            ButtonCapsule.IsEnabled = true;
+            if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
                 CurrentEditableShape = null;
@@ -312,6 +328,7 @@ namespace CG_Project_III
             ButtonPolygon.IsEnabled = true;
             ButtonEdit.IsEnabled = true;
             ButtonDelete.IsEnabled = true;
+            ButtonCapsule.IsEnabled = true;
             if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
@@ -328,6 +345,7 @@ namespace CG_Project_III
             ButtonPolygon.IsEnabled = true;
             ButtonEdit.IsEnabled = true;
             ButtonDelete.IsEnabled = true;
+            ButtonCapsule.IsEnabled = true;
             if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
@@ -344,12 +362,32 @@ namespace CG_Project_III
             ButtonPolygon.IsEnabled = false;
             ButtonEdit.IsEnabled = true;
             ButtonDelete.IsEnabled = true;
+            ButtonCapsule.IsEnabled = true;
             if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
                 CurrentEditableShape = null;
                 MyBitmap.Redraw(shapes);
             }
+        }
+        private void Capsule_Click(object sender, RoutedEventArgs e)
+        {
+            current_drawing = 6;
+            ButtonPoint.IsEnabled = true;
+            ButtonLine.IsEnabled = true;
+            ButtonCircle.IsEnabled = true;
+            ButtonPolygon.IsEnabled = true;
+            ButtonEdit.IsEnabled = true;
+            ButtonDelete.IsEnabled = true;
+            ButtonCapsule.IsEnabled = false;
+            if (CurrentEditableShape != null)
+            {
+                CurrentEditableShape.EditModeStop();
+                CurrentEditableShape = null;
+                MyBitmap.Redraw(shapes);
+            }
+            firstPosition = null;
+            lastPosition = null;
         }
         private void Edit_Click(object sender, RoutedEventArgs e)
         {
@@ -360,6 +398,7 @@ namespace CG_Project_III
             ButtonPolygon.IsEnabled = true;
             ButtonEdit.IsEnabled = false;
             ButtonDelete.IsEnabled = true;
+            ButtonCapsule.IsEnabled = true;
             if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
@@ -376,6 +415,7 @@ namespace CG_Project_III
             ButtonPolygon.IsEnabled = true;
             ButtonEdit.IsEnabled = true;
             ButtonDelete.IsEnabled = false;
+            ButtonCapsule.IsEnabled = true;
             if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
@@ -383,6 +423,7 @@ namespace CG_Project_III
                 MyBitmap.Redraw(shapes);
             }
         }
+
         private void Selected_Color1(object sender, RoutedPropertyChangedEventArgs<System.Windows.Media.Color?> e)
         {
             if (cp1.SelectedColor.HasValue)

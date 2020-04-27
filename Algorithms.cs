@@ -215,5 +215,102 @@ namespace CG_Project_III
             }
             return result;
         }
+        public static HashSet<(int, int)> Capsule(int x1, int y1, int x2, int y2 , int x3, int y3, Color col1)
+        {
+            HashSet<(int, int)> result = new HashSet<(int, int)>();
+            var radius = MyBitmap.PointDistance(x2, y2, x3, y3);
+            var V = ((double)x2 - x1, (double)y2 - y1);
+            V = (V.Item2, -V.Item1);
+            var length = MyBitmap.PointDistance(x1, y1, x2, y2);
+            V = (V.Item1 / length, V.Item2 / length);
+            V = (V.Item1 * radius, V.Item2 * radius);
+            result.UnionWith(MyBitmap.DrawLine(x1+(int)V.Item1, y1 + (int)V.Item2, x2 + (int)V.Item1, y2 + (int)V.Item2,0));
+            result.UnionWith(MyBitmap.DrawLine(x1 - (int)V.Item1, y1 - (int)V.Item2, x2 - (int)V.Item1, y2 - (int)V.Item2,0));
+            result.UnionWith(CapsuleCircle(x1,y1, x1 + (int)V.Item1, y1 + (int)V.Item2,col1));
+            result.UnionWith(CapsuleCircle(x2, y2, x2 - (int)V.Item1, y2 - (int)V.Item2,col1));
+            return result;
+        }
+
+        public static HashSet<(int, int)> CapsuleCircle(int origin_x, int origin_y, int Ex, int Ey, Color color)
+        {
+            HashSet<(int, int)> result = new HashSet<(int, int)>();
+            int R = (int)MyBitmap.PointDistance(origin_x, origin_y, Ex, Ey);
+            int dE = 3;
+            int dSE = 5 - 2 * R;
+            int d = 1 - R;
+            int x = 0;
+            int y = R;
+            if(Math.Sign((Ex - origin_x) * (y + origin_y - origin_y) - (Ey - origin_y) * (x + origin_x - origin_x))<0)
+                MyBitmap.DrawPixel(x + origin_x, y + origin_y, color);
+            if (Math.Sign((Ex - origin_x) * (origin_y - origin_y) - (Ey - origin_y) * (origin_x + R - origin_x)) < 0)
+                MyBitmap.DrawPixel(origin_x + R, origin_y, color);
+            if (Math.Sign((Ex - origin_x) * (origin_y - origin_y) - (Ey - origin_y) * (origin_x - R - origin_x)) < 0)
+                MyBitmap.DrawPixel(origin_x - R, origin_y, color);
+            while (y > x)
+            {
+                if (d < 0)
+                {
+                    d += dE;
+                    dE += 2;
+                    dSE += 2;
+                }
+                else
+                {
+                    d += dSE;
+                    dE += 2;
+                    dSE += 4;
+                    --y;
+                }
+                ++x;
+                if (Math.Sign((Ex - origin_x) * (origin_y + y - origin_y) - (Ey - origin_y) * (origin_x + x - origin_x)) < 0)
+                {
+                    MyBitmap.DrawPixel(origin_x + x, origin_y + y, color);
+                    result.Add((origin_x + x, origin_y + y));
+                }                  
+                if (Math.Sign((Ex - origin_x) * (origin_y - y - origin_y) - (Ey - origin_y) * (origin_x + x - origin_x)) < 0)
+                {
+                    MyBitmap.DrawPixel(origin_x + x, origin_y - y, color);
+                    result.Add((origin_x + x, origin_y - y));
+                }
+                    
+                if (Math.Sign((Ex - origin_x) * (origin_y + y - origin_y) - (Ey - origin_y) * (origin_x - x - origin_x)) < 0)
+                {
+                    MyBitmap.DrawPixel(origin_x - x, origin_y + y, color);
+                    result.Add((origin_x + x, origin_y + y));
+                }
+                    
+                if (Math.Sign((Ex - origin_x) * (origin_y - y - origin_y) - (Ey - origin_y) * (origin_x - x - origin_x)) < 0)
+                {
+                    MyBitmap.DrawPixel(origin_x - x, origin_y - y, color);
+                    result.Add((origin_x - x, origin_y - y));
+                }
+                    
+                if (Math.Sign((Ex - origin_x) * (origin_y + x - origin_y) - (Ey - origin_y) * (origin_x + y - origin_x)) < 0)
+                {
+                    MyBitmap.DrawPixel(origin_x + y, origin_y + x, color);
+                    result.Add((origin_x + y, origin_y + x));
+                }
+                   
+                if (Math.Sign((Ex - origin_x) * (origin_y - x - origin_y) - (Ey - origin_y) * (origin_x + y - origin_x)) < 0)
+                {
+                    MyBitmap.DrawPixel(origin_x + y, origin_y - x, color);
+                    result.Add((origin_x + y, origin_y - x));
+                }
+                    
+                if (Math.Sign((Ex - origin_x) * (origin_y + x - origin_y) - (Ey - origin_y) * (origin_x - y - origin_x)) < 0)
+                {
+                    MyBitmap.DrawPixel(origin_x - y, origin_y + x, color);
+                    result.Add((origin_x - y, origin_y + x));
+                }
+                    
+                if (Math.Sign((Ex - origin_x) * (origin_y - x - origin_y) - (Ey - origin_y) * (origin_x - y - origin_x)) < 0)
+                {
+                    MyBitmap.DrawPixel(origin_x - y, origin_y - x, color);
+                    result.Add((origin_x - y, origin_y - x));
+                }                   
+                
+            }
+            return result;
+        }
     }
 }
