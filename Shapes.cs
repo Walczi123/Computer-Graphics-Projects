@@ -34,12 +34,32 @@ namespace CG_Project_IV
             this.R = color.R;
             this.G = color.G;
             this.B = color.B;
+        } 
+        public  Color(int R, int G, int B)
+        {
+            this.A = 255;
+            this.R = R;
+            this.G = G;
+            this.B = B;
+        }
+        public Color(int A, int R, int G, int B)
+        {
+            this.A = A;
+            this.R = R;
+            this.G = G;
+            this.B = B;
+        }
+        public Color Copy()
+        {
+            return new Color(this.A, this.R, this.G, this.B);
         }
     }
     [Serializable]
     public abstract class IShape
     {
         protected int editSize = 10;
+        protected bool editMode = false;
+        protected bool clippingMode = false;
         public Color FirstColor
         {
             set;
@@ -71,14 +91,40 @@ namespace CG_Project_IV
         }
 
         public abstract void Draw();
-        public abstract void EditModeStart();
-        public abstract void EditModeStop();
+        public void EditModeStart()
+        {
+            editMode = true;
+            MyBitmap.Redraw();
+        }
+        public void EditModeStop()
+        {
+            if (editMode)
+            {
+                editMode = false;
+                MyBitmap.Redraw();
+            }
+        }
+
+        public void ClippingModeStart()
+        {
+            BrushSize += 5;
+            clippingMode = true;
+            this.Draw();
+        }        
+        public void ClippingModeStop()
+        {
+            if (clippingMode)
+            {
+                clippingMode = false;
+                BrushSize -= 5;
+                MyBitmap.Redraw();
+            }
+        }
 
     }
     [Serializable]
     public class Point : IShape
     {
-        private bool editMode = false;
         public Point() { }
         public Point(int x, int y)
         {
@@ -121,20 +167,10 @@ namespace CG_Project_IV
                 Pixels.UnionWith(MyBitmap.DrawPoint(X, Y, BrushSize + editSize, FirstColor));
             }
         }
-        public override void EditModeStart()
-        {
-            editMode = true;
-            this.Draw();
-        }
-        public override void EditModeStop()
-        {
-            editMode = false;
-        }
     }
     [Serializable]
     public class Line : IShape
     {
-        private bool editMode = false;
         public Line(int x1, int y1, int x2, int y2, Color color1, Color color2)
         {
             this.X1 = x1;
@@ -186,20 +222,10 @@ namespace CG_Project_IV
                 Pixels.UnionWith(MyBitmap.DrawPoint(X2, Y2, BrushSize + editSize, FirstColor));
             }
         }
-        public override void EditModeStart()
-        {
-            editMode = true;
-            this.Draw();
-        }
-        public override void EditModeStop()
-        {
-            editMode = false;
-        }
     }
     [Serializable]
     public class Circle : IShape
     {
-        private bool editMode = false;
         public Circle(int x, int y, int r, Color color1, Color color2)
         {
             this.OriginX = x;
@@ -233,20 +259,10 @@ namespace CG_Project_IV
                 Pixels.UnionWith(MyBitmap.DrawPoint(OriginX, OriginY, editSize, FirstColor));
             }
         }
-        public override void EditModeStart()
-        {
-            editMode = true;
-            this.Draw();
-        }
-        public override void EditModeStop()
-        {
-            editMode = false;
-        }
     }
     [Serializable]
     public class Polygon : IShape
     {
-        private bool editMode = false;
         public Polygon(Color color1, Color color2)
         {
             this.Vertices = new List<Point>() { };
@@ -293,15 +309,6 @@ namespace CG_Project_IV
             }
              
         }
-        public override void EditModeStart()
-        {
-            editMode = true;
-            this.Draw();
-        }
-        public override void EditModeStop()
-        {
-            editMode = false;
-        }
         public (int,int) Center()
         {
             int sum_x = 0, sum_y = 0;
@@ -340,10 +347,112 @@ namespace CG_Project_IV
         }
     }
 
+    public class Rectangle : IShape
+    {
+        public Rectangle(Color color1, Color color2)
+        {
+            this.Vertices = new List<Point>() { };
+            this.FirstColor = color1;
+            this.SecondColor = color2;
+            this.BrushSize = 0;
+            this.Pixels = null;
+        }
+        public Rectangle(int brushSize, Color color1, Color color2)
+        {
+            this.Vertices = new List<Point>() { };
+            this.FirstColor = color1;
+            this.SecondColor = color2;
+            this.BrushSize = brushSize;
+            this.Pixels = null;
+        }
+        public List<Point> Vertices
+        {
+            set;
+            get;
+        }
+        public void Add(Point point)
+        {
+            if (Vertices.Count()<= 4)
+                Vertices.Add(point);
+        }
+        public override void Draw()
+        {
+            int i;
+            Pixels = new HashSet<(int, int)>();
+            for (i = 0; i < Vertices.Count() - 1; i++)
+            {
+                Pixels.UnionWith(MyBitmap.DrawLine(Vertices[i].X, Vertices[i].Y, Vertices[i + 1].X, Vertices[i + 1].Y, BrushSize, FirstColor, SecondColor));
+                if (editMode)
+                {
+                    Pixels.UnionWith(MyBitmap.DrawPoint(Vertices[i].X, Vertices[i].Y, editSize, FirstColor));
+                }
+            }
+            Pixels.UnionWith(MyBitmap.DrawLine(Vertices[0].X, Vertices[0].Y, Vertices[i].X, Vertices[i].Y, BrushSize, FirstColor, SecondColor));
+            if (editMode)
+            {
+                Pixels.UnionWith(MyBitmap.DrawPoint(Vertices[i].X, Vertices[i].Y, editSize, FirstColor));
+                var xy = this.Center();
+                Pixels.UnionWith(MyBitmap.DrawPoint(xy.Item1, xy.Item2, editSize, FirstColor));
+            }
+
+        }
+        public (int, int) Center()
+        {
+            int sum_x = 0, sum_y = 0;
+            foreach (var vertex in Vertices)
+            {
+                sum_x += vertex.X;
+                sum_y += vertex.Y;
+            }
+            sum_x /= Vertices.Count();
+            sum_y /= Vertices.Count();
+            return (sum_x, sum_y);
+        }
+        public (int, int) WhichLine(int x, int y)
+        {
+            int i;
+            for (i = 0; i < Vertices.Count() - 1; i++)
+            {
+                var set = MyBitmap.DrawLine(Vertices[i].X, Vertices[i].Y, Vertices[i + 1].X, Vertices[i + 1].Y, BrushSize, FirstColor, SecondColor);
+                foreach (var element in set)
+                {
+                    if (MyBitmap.PointDistance(element.Item1, element.Item2, x, y) < 5)
+                    {
+                        return (i, i + 1);
+                    }
+                }
+            }
+            var set2 = MyBitmap.DrawLine(Vertices[0].X, Vertices[0].Y, Vertices[i].X, Vertices[i].Y, BrushSize, FirstColor, SecondColor);
+            foreach (var element in set2)
+            {
+                if (MyBitmap.PointDistance(element.Item1, element.Item2, x, y) < 5)
+                {
+                    return (i, 0);
+                }
+            }
+            return (-1, -1);
+        }
+        public int Right()
+        {
+            return Vertices.Max(v => v.X);
+        }
+        public int Left()
+        {
+            return Vertices.Min(v => v.X);
+        }
+        public int Top()
+        {
+            return Vertices.Min(v => v.Y);
+        }
+        public int Bottom()
+        {
+            return Vertices.Max(v => v.Y);
+        }
+    }
+
     [Serializable]
     public class Capsule : IShape
     {
-        bool editMode = false;
         public int X1
         {
             get;
@@ -395,17 +504,6 @@ namespace CG_Project_IV
                 Pixels.UnionWith(MyBitmap.DrawPoint(X1, Y1, BrushSize + editSize, FirstColor));
                 Pixels.UnionWith(MyBitmap.DrawPoint(X2, Y2, BrushSize + editSize, FirstColor));
             }
-        }
-
-        public override void EditModeStart()
-        {
-            editMode = true;
-            this.Draw();
-        }
-
-        public override void EditModeStop()
-        {
-            editMode = false;
         }
     }
 }

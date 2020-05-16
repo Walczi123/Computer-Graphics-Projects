@@ -5,6 +5,7 @@ namespace CG_Project_IV
 {
     public static class Algorithms
     {
+        #region Project III
         public static HashSet<(int, int)> lineDDA(int x1, int y1, int x2, int y2, Color color, int brushSize)
         {
             HashSet<(int, int)> result = new HashSet<(int, int)>();
@@ -50,7 +51,6 @@ namespace CG_Project_IV
             }
             return result;
         }
-
         public static HashSet<(int, int)> MidpointCircle(int origin_x, int origin_y,int R, Color color)
         {
             HashSet<(int, int)> result = new HashSet<(int, int)>();
@@ -97,7 +97,6 @@ namespace CG_Project_IV
             }
             return result;
         }
-
         public static HashSet<(int, int)> Brush(int x, int y, int size, Color color)
         {
             if (size == 0)
@@ -119,7 +118,6 @@ namespace CG_Project_IV
             }
             return result;
         }
-
         public static HashSet<(int, int)> WuLine(int x1, int y1, int x2, int y2, Color col1, Color col2)
         {
             HashSet<(int, int)> result = new HashSet<(int, int)>();
@@ -241,7 +239,6 @@ namespace CG_Project_IV
             result.UnionWith(CapsuleCircle(x2, y2, x2 - (int)V.Item1, y2 - (int)V.Item2,col1));
             return result;
         }
-
         public static HashSet<(int, int)> CapsuleCircle(int origin_x, int origin_y, int Ex, int Ey, Color color)
         {
             HashSet<(int, int)> result = new HashSet<(int, int)>();
@@ -323,5 +320,6 @@ namespace CG_Project_IV
             }
             return result;
         }
+        #endregion    
     }
 }

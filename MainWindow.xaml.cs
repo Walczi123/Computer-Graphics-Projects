@@ -16,7 +16,8 @@ namespace CG_Project_IV
     /// </summary>
     public partial class MainWindow : Window
     {
-        #region Fields Project III
+        #region Fields Common
+        private WriteableBitmap bitmap = new WriteableBitmap(100, 100, 96, 96, System.Windows.Media.PixelFormats.Bgra32, null);
         private int current_drawing = 0;
         private bool thickness = false;
         private bool firstClick = false;
@@ -24,10 +25,9 @@ namespace CG_Project_IV
         private Point firstPosition = new Point();
         private Polygon CurrentPolygon = null;
         private IShape CurrentEditableShape = null;
-        private List<IShape> shapes = new List<IShape>() { };
         #endregion
-        #region Fields Common
-        private WriteableBitmap bitmap = new WriteableBitmap(100, 100, 96, 96, System.Windows.Media.PixelFormats.Bgra32, null);
+        #region Fields Project IV
+        private Rectangle CurrentRectangle = null;
         #endregion
 
         public MainWindow()
@@ -44,7 +44,7 @@ namespace CG_Project_IV
             image.Source = bitmap;
             MyBitmap.Bitmap = bitmap;
             MyBitmap.CleanDrawArea();
-            shapes = new List<IShape>() { };
+            MyBitmap.Shapes = new List<IShape>() { };
             ThicknessComboBox.ItemsSource = Enumerable.Range(1, 30).Select(i => (object)i).ToArray();
         }
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -54,7 +54,7 @@ namespace CG_Project_IV
                 this.bitmap = new WriteableBitmap((int)image.ActualWidth + 1, (int)image.ActualHeight + 1, 96, 96, System.Windows.Media.PixelFormats.Bgra32, null);
                 image.Source = bitmap;
                 MyBitmap.Bitmap = bitmap;
-                MyBitmap.Redraw(shapes);
+                MyBitmap.Redraw();
             }
         }     
         private void Point_Click(object sender, RoutedEventArgs e)
@@ -67,13 +67,17 @@ namespace CG_Project_IV
             ButtonEdit.IsEnabled = true;
             ButtonDelete.IsEnabled = true;
             ButtonCapsule.IsEnabled = true;
+            ButtonRectangle.IsEnabled = true;
+            ButtonClipping.IsEnabled = true;
             if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
                 CurrentEditableShape = null;
-                MyBitmap.Redraw(shapes);
             }
-
+            if (MyBitmap.ClippingShape != null)
+            {
+                MyBitmap.ClippingShape.ClippingModeStop();
+            }
         }
         private void Line_Click(object sender, RoutedEventArgs e)
         {
@@ -85,11 +89,16 @@ namespace CG_Project_IV
             ButtonEdit.IsEnabled = true;
             ButtonDelete.IsEnabled = true;
             ButtonCapsule.IsEnabled = true;
+            ButtonRectangle.IsEnabled = true;
+            ButtonClipping.IsEnabled = true;
             if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
                 CurrentEditableShape = null;
-                MyBitmap.Redraw(shapes);
+            }
+            if (MyBitmap.ClippingShape != null)
+            {
+                MyBitmap.ClippingShape.ClippingModeStop();
             }
         }
         private void Circle_Click(object sender, RoutedEventArgs e)
@@ -102,11 +111,17 @@ namespace CG_Project_IV
             ButtonEdit.IsEnabled = true;
             ButtonDelete.IsEnabled = true;
             ButtonCapsule.IsEnabled = true;
+            ButtonRectangle.IsEnabled = true;
+            ButtonClipping.IsEnabled = true;
             if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
                 CurrentEditableShape = null;
-                MyBitmap.Redraw(shapes);
+                MyBitmap.Redraw();
+            }
+            if (MyBitmap.ClippingShape != null)
+            {
+                MyBitmap.ClippingShape.ClippingModeStop();
             }
         }
         private void Polygon_Click(object sender, RoutedEventArgs e)
@@ -119,12 +134,19 @@ namespace CG_Project_IV
             ButtonEdit.IsEnabled = true;
             ButtonDelete.IsEnabled = true;
             ButtonCapsule.IsEnabled = true;
+            ButtonRectangle.IsEnabled = true;
+            ButtonClipping.IsEnabled = true;
             if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
                 CurrentEditableShape = null;
-                MyBitmap.Redraw(shapes);
             }
+            if (MyBitmap.ClippingShape != null)
+            {
+                MyBitmap.ClippingShape.ClippingModeStop();
+            }
+            firstPosition = null;
+            lastPosition = null;
         }
         private void Capsule_Click(object sender, RoutedEventArgs e)
         {
@@ -136,18 +158,43 @@ namespace CG_Project_IV
             ButtonEdit.IsEnabled = true;
             ButtonDelete.IsEnabled = true;
             ButtonCapsule.IsEnabled = false;
+            ButtonRectangle.IsEnabled = true;
+            ButtonClipping.IsEnabled = true;
             if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
                 CurrentEditableShape = null;
-                MyBitmap.Redraw(shapes);
             }
-            firstPosition = null;
-            lastPosition = null;
+            if (MyBitmap.ClippingShape != null)
+            {
+                MyBitmap.ClippingShape.ClippingModeStop();
+            }
+        }       
+        private void Rectangle_Click(object sender, RoutedEventArgs e)
+        {
+            current_drawing = 5;
+            ButtonPoint.IsEnabled = true;
+            ButtonLine.IsEnabled = true;
+            ButtonCircle.IsEnabled = true;
+            ButtonPolygon.IsEnabled = true;
+            ButtonEdit.IsEnabled = true;
+            ButtonDelete.IsEnabled = true;
+            ButtonCapsule.IsEnabled = true;
+            ButtonRectangle.IsEnabled = false;
+            ButtonClipping.IsEnabled = true;
+            if (CurrentEditableShape != null)
+            {
+                CurrentEditableShape.EditModeStop();
+                CurrentEditableShape = null;
+            }
+            if (MyBitmap.ClippingShape != null)
+            {
+                MyBitmap.ClippingShape.ClippingModeStop();
+            }
         }
         private void Edit_Click(object sender, RoutedEventArgs e)
         {
-            current_drawing = 5;
+            current_drawing = 6;
             ButtonPoint.IsEnabled = true;
             ButtonLine.IsEnabled = true;
             ButtonCircle.IsEnabled = true;
@@ -155,16 +202,21 @@ namespace CG_Project_IV
             ButtonEdit.IsEnabled = false;
             ButtonDelete.IsEnabled = true;
             ButtonCapsule.IsEnabled = true;
+            ButtonRectangle.IsEnabled = true;
+            ButtonClipping.IsEnabled = true;
             if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
                 CurrentEditableShape = null;
-                MyBitmap.Redraw(shapes);
+            }
+            if (MyBitmap.ClippingShape != null)
+            {
+                MyBitmap.ClippingShape.ClippingModeStop();
             }
         }
         private void Delete_Click(object sender, RoutedEventArgs e)
         {
-            current_drawing = 6;
+            current_drawing = 7;
             ButtonPoint.IsEnabled = true;
             ButtonLine.IsEnabled = true;
             ButtonCircle.IsEnabled = true;
@@ -172,11 +224,16 @@ namespace CG_Project_IV
             ButtonEdit.IsEnabled = true;
             ButtonDelete.IsEnabled = false;
             ButtonCapsule.IsEnabled = true;
+            ButtonRectangle.IsEnabled = true;
+            ButtonClipping.IsEnabled = true;
             if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
                 CurrentEditableShape = null;
-                MyBitmap.Redraw(shapes);
+            }
+            if (MyBitmap.ClippingShape != null)
+            {
+                MyBitmap.ClippingShape.ClippingModeStop();
             }
         }
         private void ThicknessComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
@@ -185,7 +242,7 @@ namespace CG_Project_IV
             {
                 var brushSize = Int32.Parse(ThicknessComboBox.SelectedItem.ToString());
                 CurrentEditableShape.ChangeBrushSize(brushSize);
-                MyBitmap.Redraw(shapes);
+                MyBitmap.Redraw();
             }
         }
         private void CheckBox_Checked_Thickness(object sender, RoutedEventArgs e)
@@ -195,7 +252,7 @@ namespace CG_Project_IV
             {
                 var brushSize = Int32.Parse(ThicknessComboBox.SelectedItem.ToString());
                 CurrentEditableShape.ChangeBrushSize(brushSize);
-                MyBitmap.Redraw(shapes);
+                MyBitmap.Redraw();
             }
         }
         private void CheckBox_Unchecked_Thickness(object sender, RoutedEventArgs e)
@@ -205,12 +262,12 @@ namespace CG_Project_IV
         private void CheckBox_Checked_AA(object sender, RoutedEventArgs e)
         {
             MyBitmap.AntiAliasing = true;
-            MyBitmap.Redraw(shapes);
+            MyBitmap.Redraw();
         }
         private void CheckBox_Unchecked_AA(object sender, RoutedEventArgs e)
         {
             MyBitmap.AntiAliasing = false;
-            MyBitmap.Redraw(shapes);
+            MyBitmap.Redraw();
         }
         private void Save_Click(object sender, RoutedEventArgs e)
         {
@@ -224,8 +281,8 @@ namespace CG_Project_IV
                 BinaryFormatter formatter = new BinaryFormatter();
                 try
                 {
-                    if(shapes != null)
-                        formatter.Serialize(fs, shapes);
+                    if(MyBitmap.Shapes != null)
+                        formatter.Serialize(fs, MyBitmap.Shapes);
                 }
                 catch (SerializationException error)
                 {
@@ -248,7 +305,7 @@ namespace CG_Project_IV
                 try
                 {
                     BinaryFormatter formatter = new BinaryFormatter();
-                    shapes = (List<IShape>)formatter.Deserialize(fs);
+                    MyBitmap.Shapes = (List<IShape>)formatter.Deserialize(fs);
                 }
                 catch (SerializationException error)
                 {
@@ -258,7 +315,7 @@ namespace CG_Project_IV
                 {
                     fs.Close();
                 }
-                MyBitmap.Redraw(shapes);
+                MyBitmap.Redraw();
             }
         }
         private void CreateCaplsule(int x, int y)
@@ -274,157 +331,20 @@ namespace CG_Project_IV
             else
             {
                 var cap = new Capsule(firstPosition.X, firstPosition.Y, lastPosition.X, lastPosition.Y, x, y, MyBitmap.FirstColor);
-                shapes.Add(cap);
+                MyBitmap.Shapes.Add(cap);
                 cap.Draw();
                 firstPosition = null;
                 lastPosition = null;
-            }
-        }
-        private void Delete(int x, int y)
-        {
-            var del = MyBitmap.FindShape(shapes, x, y);
-            if (del != null)
-            {
-                shapes.Remove(del);
-                MyBitmap.Redraw(shapes);
-            }
-        }
-        private void Edit(int x, int y)
-        {
-            var edit = MyBitmap.FindShape(shapes, x, y);
-            var edit2 = MyBitmap.FindShape(shapes, lastPosition.X, lastPosition.Y);
-            if (CurrentEditableShape != null && edit2 == CurrentEditableShape)
-            {
-                if (CurrentEditableShape is Point)
-                {
-                    var p = CurrentEditableShape as Point;
-                    p.X = x;
-                    p.Y = y;
-                    MyBitmap.Redraw(shapes);
-                }
-                else if (CurrentEditableShape is Circle)
-                {
-                    var cir = CurrentEditableShape as Circle;
-                    var d = MyBitmap.PointDistance(cir.OriginX, cir.OriginY, lastPosition.X, lastPosition.Y);
-                    if (d < 10)
-                    {
-                        cir.OriginX = x;
-                        cir.OriginY = y;
-                        MyBitmap.Redraw(shapes);
-                    }
-                    else
-                    {
-                        var r = MyBitmap.PointDistance(cir.OriginX, cir.OriginY, x, y);
-                        cir.Radius = (int)r;
-                        MyBitmap.Redraw(shapes);
-                    }
-                }
-                else if (CurrentEditableShape is Line)
-                {
-                    var l = CurrentEditableShape as Line;
-                    var d1 = MyBitmap.PointDistance(l.X1, l.Y1, lastPosition.X, lastPosition.Y);
-                    var d2 = MyBitmap.PointDistance(l.X2, l.Y2, lastPosition.X, lastPosition.Y);
-                    if (d1 < 10)
-                    {
-                        l.X1 = x;
-                        l.Y1 = y;
-                        MyBitmap.Redraw(shapes);
-                    }
-                    else if (d2 < 10)
-                    {
-                        l.X2 = x;
-                        l.Y2 = y;
-                        MyBitmap.Redraw(shapes);
-                    }
-                }
-                else if (CurrentEditableShape is Polygon)
-                {
-                    var pol = CurrentEditableShape as Polygon;
-                    var center = pol.Center();
-                    if (MyBitmap.PointDistance(center.Item1, center.Item2, lastPosition.X, lastPosition.Y) < 10)
-                    {
-                        var dx = lastPosition.X - x;
-                        var dy = lastPosition.Y - y;
-                        foreach (var vert in pol.Vertices)
-                        {
-                            vert.X -= dx;
-                            vert.Y -= dy;
-                        }
-                        MyBitmap.Redraw(shapes);
-                        return;
-                    }
-                    for (int i = 0; i < pol.Vertices.Count; i++)
-                    {
-                        var d = MyBitmap.PointDistance(pol.Vertices[i].X, pol.Vertices[i].Y, lastPosition.X, lastPosition.Y);
-                        if (d < 10)
-                        {
-                            pol.Vertices[i].X = x;
-                            pol.Vertices[i].Y = y;
-                            MyBitmap.Redraw(shapes);
-                            break;
-                        }
-                    }
-                    var line = pol.WhichLine(lastPosition.X, lastPosition.Y);
-                    if (line.Item1 != -1)
-                    {
-                        pol.Vertices[line.Item1].X -= lastPosition.X - x;
-                        pol.Vertices[line.Item1].Y -= lastPosition.Y - y;
-                        pol.Vertices[line.Item2].X -= lastPosition.X - x;
-                        pol.Vertices[line.Item2].Y -= lastPosition.Y - y;
-                        MyBitmap.Redraw(shapes);
-                        return;
-                    }
-                }
-                else if (CurrentEditableShape is Capsule)
-                {
-                    var cap = CurrentEditableShape as Capsule;
-                    var d1 = MyBitmap.PointDistance(cap.X1, cap.Y1, lastPosition.X, lastPosition.Y);
-                    var d2 = MyBitmap.PointDistance(cap.X2, cap.Y2, lastPosition.X, lastPosition.Y);
-                    MyBitmap.DrawPoint(lastPosition.X, lastPosition.Y, 20);
-                    if (d1 < 10)
-                    {
-                        cap.X1 = x;
-                        cap.Y1 = y;
-                        MyBitmap.Redraw(shapes);
-                    }
-                    else if (d2 < 10)
-                    {
-                        cap.X2 = x;
-                        cap.Y2 = y;
-                        MyBitmap.Redraw(shapes);
-                    }
-                    else
-                    {
-                        cap.X3 = x;
-                        cap.Y3 = y;
-                        MyBitmap.Redraw(shapes);
-                    }
-                }
-            }
-            if (edit != null)
-            {
-                if (CurrentEditableShape != null)
-                {
-                    if (CurrentEditableShape != edit)
-                    {
-                        CurrentEditableShape.EditModeStop();
-                        CurrentEditableShape = edit;
-                        CurrentEditableShape.EditModeStart();
-                        MyBitmap.Redraw(shapes);
-                    }
-                }
-                else
-                {
-                    CurrentEditableShape = edit;
-                    CurrentEditableShape.EditModeStart();
-                    MyBitmap.Redraw(shapes);
-                }
             }
         }
         private void CreatePolygon(int x, int y)
         {
             if (!firstClick)
             {
+                if (firstPosition == null)
+                    firstPosition = new Point();                
+                if (lastPosition == null)
+                    lastPosition = new Point();
                 firstPosition.X = x;
                 firstPosition.Y = y;
                 lastPosition.X = x;
@@ -451,7 +371,7 @@ namespace CG_Project_IV
                 {
                     MyBitmap.DrawLine(lastPosition.X, lastPosition.Y, firstPosition.X, firstPosition.Y, CurrentPolygon.GetBrushSize());
                     CurrentPolygon.Draw();
-                    this.shapes.Add(CurrentPolygon);
+                    MyBitmap.Shapes.Add(CurrentPolygon);
                     CurrentPolygon = null;
                     firstClick = !firstClick;
                 }
@@ -469,7 +389,7 @@ namespace CG_Project_IV
             int R = (int)Math.Sqrt(Math.Pow(x - lastPosition.X, 2) + Math.Pow(y - lastPosition.Y, 2));
             var c = new Circle(lastPosition.X, lastPosition.Y, R, MyBitmap.FirstColor, MyBitmap.SecondColor);
             c.Draw();
-            shapes.Add(c);
+            MyBitmap.Shapes.Add(c);
         }
         private void CreateLine(int x, int y)
         {
@@ -478,13 +398,13 @@ namespace CG_Project_IV
                 var brushSize = Int32.Parse(ThicknessComboBox.SelectedItem.ToString());
                 var l = new Line(lastPosition.X, lastPosition.Y, x, y, brushSize, MyBitmap.FirstColor, MyBitmap.SecondColor);
                 l.Draw();
-                shapes.Add(l);
+                MyBitmap.Shapes.Add(l);
             }
             else
             {
                 var l = new Line(lastPosition.X, lastPosition.Y, x, y, MyBitmap.FirstColor, MyBitmap.SecondColor);
                 l.Draw();
-                shapes.Add(l);
+                MyBitmap.Shapes.Add(l);
             }
         }
         private void CreatePoint(int x, int y)
@@ -494,13 +414,13 @@ namespace CG_Project_IV
                 var brushSize = Int32.Parse(ThicknessComboBox.SelectedItem.ToString());
                 var p = new Point(x, y, brushSize, MyBitmap.FirstColor);
                 p.Draw();
-                shapes.Add(p);
+                MyBitmap.Shapes.Add(p);
             }
             else
             {
                 var p = new Point(x, y, 0, MyBitmap.FirstColor);
                 p.Draw();
-                shapes.Add(p);
+                MyBitmap.Shapes.Add(p);
             }
         }
         #endregion
@@ -513,7 +433,7 @@ namespace CG_Project_IV
         private void menu_clear(object sender, RoutedEventArgs e)
         {
             MyBitmap.CleanDrawArea();
-            shapes = new List<IShape>() { };
+            MyBitmap.Shapes = new List<IShape>() { };
         }
         private void Image_MouseMove(object sender, MouseEventArgs e)
         {
@@ -523,7 +443,7 @@ namespace CG_Project_IV
         }
         private void Image_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (current_drawing != 3 && current_drawing != 4)
+            if (current_drawing != 3 && current_drawing != 5)
             {
                 if (lastPosition == null)
                     lastPosition = new Point();
@@ -551,13 +471,223 @@ namespace CG_Project_IV
                     break;
                 case 4:
                     CreateCaplsule(x, y);
-                    break;
+                    break;                
                 case 5:
-                    Edit(x,y);
+                    CreateRectangle(x, y);
                     break;
                 case 6:
+                    Edit(x,y);
+                    break;
+                case 7:
                     Delete(x, y);
                     break;
+                case 8:
+                    Clipping(x, y);
+                    break;
+            }
+        }
+
+        private void Delete(int x, int y)
+        {
+            var del = MyBitmap.FindShape(MyBitmap.Shapes, x, y);
+            if (del != null)
+            {
+                if(del.Equals(MyBitmap.ClippedShape) || del.Equals(MyBitmap.ClippingShape))
+                {
+                    MyBitmap.ClippedShape = null;
+                    MyBitmap.ClippingShape = null; 
+                }
+                MyBitmap.Shapes.Remove(del);
+                MyBitmap.Redraw();
+            }
+        }
+        private void Edit(int x, int y)
+        {
+            var edit = MyBitmap.FindShape(MyBitmap.Shapes, x, y);
+            var edit2 = MyBitmap.FindShape(MyBitmap.Shapes, lastPosition.X, lastPosition.Y);
+            if (CurrentEditableShape != null && edit2 == CurrentEditableShape)
+            {
+                if (CurrentEditableShape is Point)
+                {
+                    var p = CurrentEditableShape as Point;
+                    p.X = x;
+                    p.Y = y;
+                    MyBitmap.Redraw();
+                }
+                else if (CurrentEditableShape is Circle)
+                {
+                    var cir = CurrentEditableShape as Circle;
+                    var d = MyBitmap.PointDistance(cir.OriginX, cir.OriginY, lastPosition.X, lastPosition.Y);
+                    if (d < 10)
+                    {
+                        cir.OriginX = x;
+                        cir.OriginY = y;
+                        MyBitmap.Redraw();
+                    }
+                    else
+                    {
+                        var r = MyBitmap.PointDistance(cir.OriginX, cir.OriginY, x, y);
+                        cir.Radius = (int)r;
+                        MyBitmap.Redraw();
+                    }
+                }
+                else if (CurrentEditableShape is Line)
+                {
+                    var l = CurrentEditableShape as Line;
+                    var d1 = MyBitmap.PointDistance(l.X1, l.Y1, lastPosition.X, lastPosition.Y);
+                    var d2 = MyBitmap.PointDistance(l.X2, l.Y2, lastPosition.X, lastPosition.Y);
+                    if (d1 < 10)
+                    {
+                        l.X1 = x;
+                        l.Y1 = y;
+                        MyBitmap.Redraw();
+                    }
+                    else if (d2 < 10)
+                    {
+                        l.X2 = x;
+                        l.Y2 = y;
+                        MyBitmap.Redraw();
+                    }
+                }
+                else if (CurrentEditableShape is Polygon)
+                {
+                    var pol = CurrentEditableShape as Polygon;
+                    var center = pol.Center();
+                    if (MyBitmap.PointDistance(center.Item1, center.Item2, lastPosition.X, lastPosition.Y) < 10)
+                    {
+                        var dx = lastPosition.X - x;
+                        var dy = lastPosition.Y - y;
+                        foreach (var vert in pol.Vertices)
+                        {
+                            vert.X -= dx;
+                            vert.Y -= dy;
+                        }
+                        MyBitmap.Redraw();
+                        return;
+                    }
+                    for (int i = 0; i < pol.Vertices.Count; i++)
+                    {
+                        var d = MyBitmap.PointDistance(pol.Vertices[i].X, pol.Vertices[i].Y, lastPosition.X, lastPosition.Y);
+                        if (d < 10)
+                        {
+                            pol.Vertices[i].X = x;
+                            pol.Vertices[i].Y = y;
+                            MyBitmap.Redraw();
+                            return;
+                        }
+                    }
+                    var line = pol.WhichLine(lastPosition.X, lastPosition.Y);
+                    if (line.Item1 != -1)
+                    {
+                        pol.Vertices[line.Item1].X -= lastPosition.X - x;
+                        pol.Vertices[line.Item1].Y -= lastPosition.Y - y;
+                        pol.Vertices[line.Item2].X -= lastPosition.X - x;
+                        pol.Vertices[line.Item2].Y -= lastPosition.Y - y;
+                        MyBitmap.Redraw();
+                        return;
+                    }
+                } 
+                else if (CurrentEditableShape is Rectangle)
+                {
+                    var rec = CurrentEditableShape as Rectangle;
+                    var center = rec.Center();
+                    if (MyBitmap.PointDistance(center.Item1, center.Item2, lastPosition.X, lastPosition.Y) < 10)
+                    {
+                        var dx = lastPosition.X - x;
+                        var dy = lastPosition.Y - y;
+                        foreach (var vert in rec.Vertices)
+                        {
+                            vert.X -= dx;
+                            vert.Y -= dy;
+                        }
+                        MyBitmap.Redraw();
+                        return;
+                    }
+                    for (int i = 0; i < rec.Vertices.Count; i++)
+                    {
+                        var d = MyBitmap.PointDistance(rec.Vertices[i].X, rec.Vertices[i].Y, lastPosition.X, lastPosition.Y);
+                        if (d < 10)
+                        {
+                            rec.Vertices[i].X = x;
+                            rec.Vertices[i].Y = y;
+                            var tmp1 = (i - 1) % 4;
+                            if (tmp1 == -1)
+                                tmp1 = 3;
+                            var tmp2 = (i + 1) % 4;
+                            if ( i%2 == 0)
+                            {
+                                rec.Vertices[tmp1].Y = y;
+                                rec.Vertices[tmp2].X = x;
+                            }
+                            else
+                            {
+                                rec.Vertices[tmp1].X = x;
+                                rec.Vertices[tmp2].Y = y;
+                            }                 
+                            MyBitmap.Redraw();
+                            return;
+                        }
+                    }
+                    var line = rec.WhichLine(lastPosition.X, lastPosition.Y);
+                    if (line.Item1 != -1)
+                    {
+                        if (line.Item1 % 2 == 0)
+                        {
+                            rec.Vertices[line.Item1].X -= lastPosition.X - x;
+                            rec.Vertices[line.Item2].X -= lastPosition.X - x;
+                        }
+                        else
+                        {
+                            rec.Vertices[line.Item1].Y -= lastPosition.Y - y;
+                            rec.Vertices[line.Item2].Y -= lastPosition.Y - y;
+                        }
+                        MyBitmap.Redraw();
+                        return;
+                    }
+                }
+                else if (CurrentEditableShape is Capsule)
+                {
+                    var cap = CurrentEditableShape as Capsule;
+                    var d1 = MyBitmap.PointDistance(cap.X1, cap.Y1, lastPosition.X, lastPosition.Y);
+                    var d2 = MyBitmap.PointDistance(cap.X2, cap.Y2, lastPosition.X, lastPosition.Y);
+                    MyBitmap.DrawPoint(lastPosition.X, lastPosition.Y, 20);
+                    if (d1 < 10)
+                    {
+                        cap.X1 = x;
+                        cap.Y1 = y;
+                        MyBitmap.Redraw();
+                    }
+                    else if (d2 < 10)
+                    {
+                        cap.X2 = x;
+                        cap.Y2 = y;
+                        MyBitmap.Redraw();
+                    }
+                    else
+                    {
+                        cap.X3 = x;
+                        cap.Y3 = y;
+                        MyBitmap.Redraw();
+                    }
+                }
+            }
+            if (edit != null)
+            {
+                if (CurrentEditableShape != null)
+                {
+                    if (CurrentEditableShape != edit)
+                    {
+                        CurrentEditableShape.EditModeStop();
+                        CurrentEditableShape = edit;
+                        CurrentEditableShape.EditModeStart();
+                    }
+                }
+                else
+                {
+                    CurrentEditableShape = edit;
+                    CurrentEditableShape.EditModeStart();
+                    MyBitmap.Redraw();
+                }
             }
         }
         private void Selected_Color1(object sender, RoutedPropertyChangedEventArgs<System.Windows.Media.Color?> e)
@@ -588,6 +718,107 @@ namespace CG_Project_IV
             {
                 CurrentEditableShape.SecondColor = MyBitmap.FirstColor;
                 CurrentEditableShape.Draw();
+            }
+        }
+        #endregion
+        #region Methods Project IV
+        private void CreateRectangle(int x, int y)
+        {
+            if (!firstClick)
+            {
+                if (firstPosition == null)
+                    firstPosition = new Point();
+                firstPosition.X = x;
+                firstPosition.Y = y;
+                if (thickness && ThicknessComboBox.SelectedItem != null)
+                {
+                    var brushSize = Int32.Parse(ThicknessComboBox.SelectedItem.ToString());
+                    MyBitmap.DrawPoint(x, y, brushSize);
+                    CurrentRectangle = new Rectangle(brushSize, MyBitmap.FirstColor, MyBitmap.SecondColor);
+                    CurrentRectangle.Add(new Point(x, y));
+                }
+                else
+                {
+                    MyBitmap.DrawPoint(firstPosition.X, firstPosition.Y, 0);
+                    CurrentRectangle = new Rectangle(MyBitmap.FirstColor, MyBitmap.SecondColor);
+                    CurrentRectangle.Add(new Point(x, y));
+                }
+                firstClick = !firstClick;
+            }
+            else
+            {
+                CurrentRectangle.Add(new Point(firstPosition.X, y));
+                CurrentRectangle.Add(new Point(x, y));
+                CurrentRectangle.Add(new Point(x, firstPosition.Y));
+                CurrentRectangle.Draw();
+                MyBitmap.Shapes.Add(CurrentRectangle);
+                CurrentRectangle = null;
+                firstClick = !firstClick;
+                firstPosition = null;
+            }
+        }
+        private void Clipping_Click(object sender, RoutedEventArgs e)
+        {
+            current_drawing = 8;
+            ButtonPoint.IsEnabled = true;
+            ButtonLine.IsEnabled = true;
+            ButtonCircle.IsEnabled = true;
+            ButtonPolygon.IsEnabled = true;
+            ButtonEdit.IsEnabled = true;
+            ButtonDelete.IsEnabled = true;
+            ButtonCapsule.IsEnabled = true;
+            ButtonRectangle.IsEnabled = true;
+            ButtonClipping.IsEnabled = false;
+            if (CurrentEditableShape != null)
+            {
+                CurrentEditableShape.EditModeStop();
+                CurrentEditableShape = null;
+            }
+            if (MyBitmap.ClippingShape != null)
+            {              
+                MyBitmap.ClippingShape.ClippingModeStop();
+                MyBitmap.ClippingShape = null;
+                MyBitmap.ClippedShape = null;
+            }
+        }
+        private void Clipping(int x, int y)
+        {
+            var shape = MyBitmap.FindShape(MyBitmap.Shapes, x, y);
+            if (MyBitmap.ClippingShape == null)
+            {
+                if (shape is Rectangle)
+                {
+                    MyBitmap.ClippingShape = shape as Rectangle;
+                    MyBitmap.ClippingShape.ClippingModeStart();
+                }
+            }
+            else
+            {
+                if (!shape.Equals(MyBitmap.ClippingShape))
+                {
+                    MyBitmap.ClippedShape = shape;
+                    MyBitmap.ClippingShape.ClippingModeStop();
+                    ButtonClipping.IsEnabled = true;
+                }
+            }
+        }
+        private void CheckBox_Checked_Clipping(object sender, RoutedEventArgs e)
+        {
+            MyBitmap.clipping = true;
+            MyBitmap.Redraw();
+        }
+        private void CheckBox_Unchecked_Clipping(object sender, RoutedEventArgs e)
+        {
+            MyBitmap.clipping = false;
+            MyBitmap.Redraw();
+        }
+        private void Selected_ClippingColor(object sender, RoutedPropertyChangedEventArgs<System.Windows.Media.Color?> e)
+        {
+            if (clippingColor.SelectedColor.HasValue)
+            {
+                var color = new Color(clippingColor.SelectedColor.Value);
+                MyBitmap.ClippingColor = color;
+                MyBitmap.Redraw();
             }
         }
         #endregion

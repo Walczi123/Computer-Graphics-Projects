@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
@@ -7,6 +8,18 @@ namespace CG_Project_IV
 {
     public static class MyBitmap
     {
+        public static List<IShape> Shapes = new List<IShape>() { };
+        public static Rectangle ClippingShape
+        {
+            get;
+            set;
+        }            
+        public static IShape ClippedShape
+        {
+            get;
+            set;
+        }
+        public static bool clipping = false;       
         public static WriteableBitmap Bitmap
         {
             get;
@@ -23,6 +36,11 @@ namespace CG_Project_IV
             set;
         }
         public static Color SecondColor
+        {
+            get;
+            set;
+        }        
+        public static Color ClippingColor
         {
             get;
             set;
@@ -70,7 +88,24 @@ namespace CG_Project_IV
             }
             Bitmap.Unlock();
             return result;
+        }        
+        internal static HashSet<(int, int)> DrawLine(int x1, int y1, int x2, int y2, int brushSize, Color color)
+        {
+            HashSet<(int, int)> result;
+            Bitmap.Lock();
+            if (AntiAliasing)
+            {
+                result = Algorithms.WuLine(x1, y1, x2, y2, color, SecondColor);
+            }
+            else
+            {
+                result = Algorithms.lineDDA(x1, y1, x2, y2, color, brushSize);
+            }
+            Bitmap.Unlock();
+            return result;
         }
+
+
         internal static HashSet<(int, int)> DrawCircle(int origin_x, int origin_y, int R)
         {
             HashSet<(int, int)> result;
@@ -197,11 +232,30 @@ namespace CG_Project_IV
             }
         }
 
-        internal static void Redraw(List<IShape> shapes)
+        internal static void Redraw()
         {
+            if (MyBitmap.Bitmap == null)
+                return;
             MyBitmap.CleanDrawArea();
-            foreach (var shape in shapes)
+            foreach (var shape in Shapes)
                 shape.Draw();
+            if ( clipping && ClippedShape != null && ClippingShape != null)
+            {
+                if (ClippedShape is Line)
+                {
+                    var line = ClippedShape as Line;
+                    ClippingAlgorithm.CohenSutherland(new Point(line.X1, line.Y1), new Point(line.X2, line.Y2), ClippingShape, line.GetBrushSize(), MyBitmap.ClippingColor);
+                }
+                else if (ClippedShape is Polygon)
+                {
+                    var polygon = ClippedShape as Polygon;
+                    var vertices = polygon.Vertices;
+                    int i = 0;
+                    for (; i < vertices.Count() - 1; i++)
+                        ClippingAlgorithm.CohenSutherland(vertices[i], vertices[i + 1], ClippingShape, polygon.GetBrushSize(), MyBitmap.ClippingColor);
+                    ClippingAlgorithm.CohenSutherland(vertices[0], vertices[i], ClippingShape, polygon.GetBrushSize(), MyBitmap.ClippingColor);
+                }
+            }
         }
 
         internal static IShape FindShape(List<IShape> shapes, int x, int y)
