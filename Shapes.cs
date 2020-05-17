@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
-using System.Windows.Controls;
 
 namespace CG_Project_IV
 {
@@ -48,6 +48,13 @@ namespace CG_Project_IV
             this.R = R;
             this.G = G;
             this.B = B;
+        }        
+        public Color()
+        {
+            this.A = 255;
+            this.R = 0;
+            this.G = 0;
+            this.B = 0;
         }
         public Color Copy()
         {
@@ -290,6 +297,14 @@ namespace CG_Project_IV
         }
         public override void Draw()
         {
+            if (FillColor != null)
+            {
+                FillingAlgorithms.FillPolygon(Vertices, FillColor);
+            }
+            else if (FillPattern != null)
+            {
+                FillingAlgorithms.FillPolygon(Vertices, FillPattern);
+            }
             int i;
             Pixels = new HashSet<(int, int)>();
             for (i = 0; i < Vertices.Count() - 1; i++)
@@ -307,7 +322,6 @@ namespace CG_Project_IV
                 var xy = this.Center();
                 Pixels.UnionWith(MyBitmap.DrawPoint(xy.Item1, xy.Item2, editSize, FirstColor));
             }
-             
         }
         public (int,int) Center()
         {
@@ -345,8 +359,10 @@ namespace CG_Project_IV
             }
             return (-1, -1);
         }
+        public Color FillColor = null;
+        public Bitmap FillPattern = null;
     }
-
+    [Serializable]
     public class Rectangle : IShape
     {
         public Rectangle(Color color1, Color color2)
@@ -377,6 +393,14 @@ namespace CG_Project_IV
         }
         public override void Draw()
         {
+            if (FillColor != null)
+            {
+                FillingAlgorithms.FillPolygon(Vertices, FillColor);
+            }
+            else if (FillPattern != null)
+            {
+                FillingAlgorithms.FillPolygon(Vertices, FillPattern);
+            }
             int i;
             Pixels = new HashSet<(int, int)>();
             for (i = 0; i < Vertices.Count() - 1; i++)
@@ -393,8 +417,7 @@ namespace CG_Project_IV
                 Pixels.UnionWith(MyBitmap.DrawPoint(Vertices[i].X, Vertices[i].Y, editSize, FirstColor));
                 var xy = this.Center();
                 Pixels.UnionWith(MyBitmap.DrawPoint(xy.Item1, xy.Item2, editSize, FirstColor));
-            }
-
+            }          
         }
         public (int, int) Center()
         {
@@ -432,6 +455,8 @@ namespace CG_Project_IV
             }
             return (-1, -1);
         }
+        public Color FillColor = null;
+        public Bitmap FillPattern = null;
         public int Right()
         {
             return Vertices.Max(v => v.X);
@@ -449,7 +474,6 @@ namespace CG_Project_IV
             return Vertices.Max(v => v.Y);
         }
     }
-
     [Serializable]
     public class Capsule : IShape
     {

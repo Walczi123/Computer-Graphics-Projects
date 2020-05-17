@@ -255,6 +255,15 @@ namespace CG_Project_IV
                         ClippingAlgorithm.CohenSutherland(vertices[i], vertices[i + 1], ClippingShape, polygon.GetBrushSize(), MyBitmap.ClippingColor);
                     ClippingAlgorithm.CohenSutherland(vertices[0], vertices[i], ClippingShape, polygon.GetBrushSize(), MyBitmap.ClippingColor);
                 }
+                else if (ClippedShape is Rectangle)
+                {
+                    var rectangle = ClippedShape as Rectangle;
+                    var vertices = rectangle.Vertices;
+                    int i = 0;
+                    for (; i < vertices.Count() - 1; i++)
+                        ClippingAlgorithm.CohenSutherland(vertices[i], vertices[i + 1], ClippingShape, rectangle.GetBrushSize(), MyBitmap.ClippingColor);
+                    ClippingAlgorithm.CohenSutherland(vertices[0], vertices[i], ClippingShape, rectangle.GetBrushSize(), MyBitmap.ClippingColor);
+                }
             }
         }
 

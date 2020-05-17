@@ -1,12 +1,16 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Interop;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace CG_Project_IV
@@ -17,7 +21,7 @@ namespace CG_Project_IV
     public partial class MainWindow : Window
     {
         #region Fields Common
-        private WriteableBitmap bitmap = new WriteableBitmap(100, 100, 96, 96, System.Windows.Media.PixelFormats.Bgra32, null);
+        private WriteableBitmap bitmap = new WriteableBitmap(100, 100, 96, 96, System.Windows.Media.PixelFormats.Bgra32, BitmapPalettes.Halftone256);
         private int current_drawing = 0;
         private bool thickness = false;
         private bool firstClick = false;
@@ -28,7 +32,15 @@ namespace CG_Project_IV
         #endregion
         #region Fields Project IV
         private Rectangle CurrentRectangle = null;
+        private Color FillingColor;
+        private Bitmap FillingPattern = null;
         #endregion
+
+        public void Image(ImageSource bitmap)
+        {
+            image.Source = bitmap;
+        }
+
 
         public MainWindow()
         {
@@ -40,7 +52,7 @@ namespace CG_Project_IV
         #region Methods Project III
         private void Window_ContentRendered(object sender, EventArgs e)
         {
-            this.bitmap = new WriteableBitmap((int)image.ActualWidth + 1, (int)image.ActualHeight + 1, 96, 96, System.Windows.Media.PixelFormats.Bgra32, null);
+            this.bitmap = new WriteableBitmap((int)image.ActualWidth + 1, (int)image.ActualHeight + 1, 96, 96, System.Windows.Media.PixelFormats.Bgra32, BitmapPalettes.Halftone256);
             image.Source = bitmap;
             MyBitmap.Bitmap = bitmap;
             MyBitmap.CleanDrawArea();
@@ -51,7 +63,7 @@ namespace CG_Project_IV
         {
             if ((int)image.ActualWidth > 0 && (int)image.ActualHeight > 0)
             {
-                this.bitmap = new WriteableBitmap((int)image.ActualWidth + 1, (int)image.ActualHeight + 1, 96, 96, System.Windows.Media.PixelFormats.Bgra32, null);
+                this.bitmap = new WriteableBitmap((int)image.ActualWidth + 1, (int)image.ActualHeight + 1, 96, 96, System.Windows.Media.PixelFormats.Bgra32, BitmapPalettes.Halftone256);
                 image.Source = bitmap;
                 MyBitmap.Bitmap = bitmap;
                 MyBitmap.Redraw();
@@ -69,6 +81,7 @@ namespace CG_Project_IV
             ButtonCapsule.IsEnabled = true;
             ButtonRectangle.IsEnabled = true;
             ButtonClipping.IsEnabled = true;
+            ButtonFillColor.IsEnabled = true;
             if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
@@ -91,6 +104,8 @@ namespace CG_Project_IV
             ButtonCapsule.IsEnabled = true;
             ButtonRectangle.IsEnabled = true;
             ButtonClipping.IsEnabled = true;
+            ButtonFillColor.IsEnabled = true;
+            ButtonFillPattern.IsEnabled = true;
             if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
@@ -113,6 +128,8 @@ namespace CG_Project_IV
             ButtonCapsule.IsEnabled = true;
             ButtonRectangle.IsEnabled = true;
             ButtonClipping.IsEnabled = true;
+            ButtonFillColor.IsEnabled = true;
+            ButtonFillPattern.IsEnabled = true;
             if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
@@ -136,6 +153,8 @@ namespace CG_Project_IV
             ButtonCapsule.IsEnabled = true;
             ButtonRectangle.IsEnabled = true;
             ButtonClipping.IsEnabled = true;
+            ButtonFillColor.IsEnabled = true;
+            ButtonFillPattern.IsEnabled = true;
             if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
@@ -160,6 +179,8 @@ namespace CG_Project_IV
             ButtonCapsule.IsEnabled = false;
             ButtonRectangle.IsEnabled = true;
             ButtonClipping.IsEnabled = true;
+            ButtonFillColor.IsEnabled = true;
+            ButtonFillPattern.IsEnabled = true;
             if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
@@ -182,6 +203,8 @@ namespace CG_Project_IV
             ButtonCapsule.IsEnabled = true;
             ButtonRectangle.IsEnabled = false;
             ButtonClipping.IsEnabled = true;
+            ButtonFillColor.IsEnabled = true;
+            ButtonFillPattern.IsEnabled = true;
             if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
@@ -204,6 +227,8 @@ namespace CG_Project_IV
             ButtonCapsule.IsEnabled = true;
             ButtonRectangle.IsEnabled = true;
             ButtonClipping.IsEnabled = true;
+            ButtonFillColor.IsEnabled = true;
+            ButtonFillPattern.IsEnabled = true;
             if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
@@ -226,6 +251,8 @@ namespace CG_Project_IV
             ButtonCapsule.IsEnabled = true;
             ButtonRectangle.IsEnabled = true;
             ButtonClipping.IsEnabled = true;
+            ButtonFillColor.IsEnabled = true;
+            ButtonFillPattern.IsEnabled = true;
             if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
@@ -484,9 +511,14 @@ namespace CG_Project_IV
                 case 8:
                     Clipping(x, y);
                     break;
+                case 9:
+                    ColorFilling(x, y);
+                    break;                
+                case 10:
+                    PatternFilling(x, y);
+                    break;
             }
         }
-
         private void Delete(int x, int y)
         {
             var del = MyBitmap.FindShape(MyBitmap.Shapes, x, y);
@@ -769,6 +801,7 @@ namespace CG_Project_IV
             ButtonCapsule.IsEnabled = true;
             ButtonRectangle.IsEnabled = true;
             ButtonClipping.IsEnabled = false;
+            ButtonFillColor.IsEnabled = true;
             if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
@@ -779,6 +812,65 @@ namespace CG_Project_IV
                 MyBitmap.ClippingShape.ClippingModeStop();
                 MyBitmap.ClippingShape = null;
                 MyBitmap.ClippedShape = null;
+            }
+        }
+        private void FillColor_Click(object sender, RoutedEventArgs e)
+        {
+            current_drawing = 9;
+            ButtonPoint.IsEnabled = true;
+            ButtonLine.IsEnabled = true;
+            ButtonCircle.IsEnabled = true;
+            ButtonPolygon.IsEnabled = true;
+            ButtonEdit.IsEnabled = true;
+            ButtonDelete.IsEnabled = true;
+            ButtonCapsule.IsEnabled = true;
+            ButtonRectangle.IsEnabled = true;
+            ButtonClipping.IsEnabled = true;
+            ButtonFillColor.IsEnabled = false;
+            ButtonFillPattern.IsEnabled = true;
+            if (CurrentEditableShape != null)
+            {
+                CurrentEditableShape.EditModeStop();
+                CurrentEditableShape = null;
+            }
+            if (MyBitmap.ClippingShape != null)
+            {
+                MyBitmap.ClippingShape.ClippingModeStop();
+            }
+        }
+        private void ChoosePattern_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog op = new OpenFileDialog();
+            op.Title = "Select a picture";
+            op.Filter = "All supported graphics|*.jpg;*.jpeg;*bmp|" +
+              "JPEG|*.jpg;*.jpeg|" +
+              "Bitmap|*.bmp";
+            if (op.ShowDialog() == true)
+            {
+                FillingPattern = new System.Drawing.Bitmap(op.FileName);            
+            }
+        }   
+        private void FillPattern_Click(object sender, RoutedEventArgs e)
+        {
+            current_drawing = 10;
+            ButtonPoint.IsEnabled = false;
+            ButtonLine.IsEnabled = true;
+            ButtonCircle.IsEnabled = true;
+            ButtonPolygon.IsEnabled = true;
+            ButtonEdit.IsEnabled = true;
+            ButtonDelete.IsEnabled = true;
+            ButtonCapsule.IsEnabled = true;
+            ButtonRectangle.IsEnabled = true;
+            ButtonClipping.IsEnabled = true;
+            ButtonFillColor.IsEnabled = true;
+            if (CurrentEditableShape != null)
+            {
+                CurrentEditableShape.EditModeStop();
+                CurrentEditableShape = null;
+            }
+            if (MyBitmap.ClippingShape != null)
+            {
+                MyBitmap.ClippingShape.ClippingModeStop();
             }
         }
         private void Clipping(int x, int y)
@@ -802,6 +894,47 @@ namespace CG_Project_IV
                 }
             }
         }
+        private void ColorFilling(int x, int y)
+        {
+            var shape = MyBitmap.FindShape(MyBitmap.Shapes, x, y);
+            if ( shape is Rectangle)
+            {
+                var rect = shape as Rectangle;
+                rect.FillColor = FillingColor;
+                rect.FillPattern = null;
+                rect.Draw();
+            }
+            else if (shape is Polygon)
+            {
+                var poly = shape as Polygon;
+                poly.FillColor = FillingColor;
+                poly.FillPattern = null;
+                poly.Draw();
+            }
+        } 
+        private void PatternFilling(int x, int y)
+        {
+            if (FillingPattern == null)
+                MessageBox.Show("Firstly choose pattern");
+            else
+            {
+                var shape = MyBitmap.FindShape(MyBitmap.Shapes, x, y);
+                if (shape is Rectangle)
+                {
+                    var rect = shape as Rectangle;
+                    rect.FillColor = null;
+                    rect.FillPattern = FillingPattern;
+                    rect.Draw();
+                }
+                else if (shape is Polygon)
+                {
+                    var poly = shape as Polygon;
+                    poly.FillColor = null;
+                    poly.FillPattern = FillingPattern;
+                    poly.Draw();
+                }
+            }
+        }     
         private void CheckBox_Checked_Clipping(object sender, RoutedEventArgs e)
         {
             MyBitmap.clipping = true;
@@ -819,6 +952,14 @@ namespace CG_Project_IV
                 var color = new Color(clippingColor.SelectedColor.Value);
                 MyBitmap.ClippingColor = color;
                 MyBitmap.Redraw();
+            }
+        }
+        private void Selected_FillingColor(object sender, RoutedPropertyChangedEventArgs<System.Windows.Media.Color?> e)
+        {
+            if (fillingColor.SelectedColor.HasValue)
+            {
+                var color = new Color(fillingColor.SelectedColor.Value);
+                FillingColor = color;
             }
         }
         #endregion

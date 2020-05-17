@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:CG_Project_IV"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
-        Title="CG_Project_IV" Height="550" Width="870" MinHeight="500" MinWidth="640"
+        Title="CG_Project_IV" Height="700" Width="870" MinHeight="500" MinWidth="640"
         ContentRendered="Window_ContentRendered"
         SizeChanged="Window_SizeChanged"
         >
@@ -44,7 +44,11 @@
                 <RowDefinition Height="30"/> 
                 <RowDefinition Height="30"/>                 
                 <RowDefinition Height="30"/> 
+                <RowDefinition Height="30"/> 
+                <RowDefinition Height="30"/> 
+                <RowDefinition Height="30"/> 
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="30"/>
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="30"/>
@@ -74,7 +78,10 @@
                 <Button x:Name="ButtonClipping" Grid.Row="11" Margin="5,5,5,5" Content="Clipping" Click="Clipping_Click" IsEnabled="True" Width="100"/>
                 <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,5,0" Checked="CheckBox_Checked_Clipping" Unchecked="CheckBox_Unchecked_Clipping" IsChecked="True"/>
             </DockPanel>
-            <Grid Grid.Row="13">
+            <Button x:Name="ButtonFillColor" Grid.Row="12" Margin="5,5,5,5" Content="Fill with Color" Click="FillColor_Click" IsEnabled="True"/>
+            <Button x:Name="ButtonChoosePattern" Grid.Row="13" Margin="5,5,5,5" Content="Choose Pattern" Click="ChoosePattern_Click" IsEnabled="True"/>
+            <Button x:Name="ButtonFillPattern" Grid.Row="14" Margin="5,5,5,5" Content="Fill with Pattern" Click="FillPattern_Click" IsEnabled="True"/>
+            <Grid Grid.Row="16">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
@@ -82,22 +89,27 @@
                 <Button x:Name="ButtonSave" Grid.Column="0" Margin="5,5,5,5" Content="Save" Click="Save_Click" VerticalAlignment="Center" HorizontalAlignment="Center" Width="50"/>
                 <Button x:Name="ButtonLoad" Grid.Column="1" Margin="5,5,5,5" Content="Load" Click="Load_Click" VerticalAlignment="Center" HorizontalAlignment="Center" Width="50"/>
             </Grid>
-            <DockPanel Grid.Row="14">
+            <DockPanel Grid.Row="17">
                 <TextBlock Text="1st  Color" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,5,0"/>
                 <xctk:ColorPicker Name="cp1" DisplayColorAndName="True" SelectedColorChanged="Selected_Color1" AvailableColorsSortingMode="HueSaturationBrightness" Margin="2,2,2,2" 
                                   SelectedColor="Black"/>
             </DockPanel>
-            <DockPanel Grid.Row="15">
+            <DockPanel Grid.Row="18">
                 <TextBlock Text="2nd Color" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,5,0"/>
                 <xctk:ColorPicker Name="cp2" DisplayColorAndName="True" SelectedColorChanged="Selected_Color2" AvailableColorsSortingMode="HueSaturationBrightness" Margin="2,2,2,2" 
                                   SelectedColor="#7F000000"/>
             </DockPanel>            
-            <DockPanel Grid.Row="16">
+            <DockPanel Grid.Row="19">
                 <TextBlock Text="Clipping Color" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,5,0"/>
                 <xctk:ColorPicker Name="clippingColor" DisplayColorAndName="True" SelectedColorChanged="Selected_ClippingColor" AvailableColorsSortingMode="HueSaturationBrightness" Margin="2,2,2,2" 
                                   SelectedColor="BlueViolet"/>
+            </DockPanel>            
+            <DockPanel Grid.Row="20">
+                <TextBlock Text="Filling Color" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,5,0"/>
+                <xctk:ColorPicker Name="fillingColor" DisplayColorAndName="True" SelectedColorChanged="Selected_FillingColor" AvailableColorsSortingMode="HueSaturationBrightness" Margin="2,2,2,2" 
+                                  SelectedColor="Green"/>
             </DockPanel>
-            <Grid Grid.Row="17">
+            <Grid Grid.Row="21">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
