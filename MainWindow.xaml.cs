@@ -82,6 +82,7 @@ namespace CG_Project_IV
             ButtonRectangle.IsEnabled = true;
             ButtonClipping.IsEnabled = true;
             ButtonFillColor.IsEnabled = true;
+            ButtonFloodFill.IsEnabled = true;
             if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
@@ -106,6 +107,7 @@ namespace CG_Project_IV
             ButtonClipping.IsEnabled = true;
             ButtonFillColor.IsEnabled = true;
             ButtonFillPattern.IsEnabled = true;
+            ButtonFloodFill.IsEnabled = true;
             if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
@@ -130,6 +132,7 @@ namespace CG_Project_IV
             ButtonClipping.IsEnabled = true;
             ButtonFillColor.IsEnabled = true;
             ButtonFillPattern.IsEnabled = true;
+            ButtonFloodFill.IsEnabled = true;
             if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
@@ -155,6 +158,7 @@ namespace CG_Project_IV
             ButtonClipping.IsEnabled = true;
             ButtonFillColor.IsEnabled = true;
             ButtonFillPattern.IsEnabled = true;
+            ButtonFloodFill.IsEnabled = true;
             if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
@@ -181,6 +185,7 @@ namespace CG_Project_IV
             ButtonClipping.IsEnabled = true;
             ButtonFillColor.IsEnabled = true;
             ButtonFillPattern.IsEnabled = true;
+            ButtonFloodFill.IsEnabled = true;
             if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
@@ -205,6 +210,7 @@ namespace CG_Project_IV
             ButtonClipping.IsEnabled = true;
             ButtonFillColor.IsEnabled = true;
             ButtonFillPattern.IsEnabled = true;
+            ButtonFloodFill.IsEnabled = true;
             if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
@@ -229,6 +235,7 @@ namespace CG_Project_IV
             ButtonClipping.IsEnabled = true;
             ButtonFillColor.IsEnabled = true;
             ButtonFillPattern.IsEnabled = true;
+            ButtonFloodFill.IsEnabled = true;
             if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
@@ -253,6 +260,7 @@ namespace CG_Project_IV
             ButtonClipping.IsEnabled = true;
             ButtonFillColor.IsEnabled = true;
             ButtonFillPattern.IsEnabled = true;
+            ButtonFloodFill.IsEnabled = true;
             if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
@@ -516,6 +524,9 @@ namespace CG_Project_IV
                     break;                
                 case 10:
                     PatternFilling(x, y);
+                    break;                
+                case 11:
+                    FloodFilling(x, y);
                     break;
             }
         }
@@ -849,11 +860,11 @@ namespace CG_Project_IV
             {
                 FillingPattern = new System.Drawing.Bitmap(op.FileName);            
             }
-        }   
-        private void FillPattern_Click(object sender, RoutedEventArgs e)
+        }
+        private void FloodFill_Click(object sender, RoutedEventArgs e)
         {
-            current_drawing = 10;
-            ButtonPoint.IsEnabled = false;
+            current_drawing = 11;
+            ButtonPoint.IsEnabled = true;
             ButtonLine.IsEnabled = true;
             ButtonCircle.IsEnabled = true;
             ButtonPolygon.IsEnabled = true;
@@ -863,6 +874,31 @@ namespace CG_Project_IV
             ButtonRectangle.IsEnabled = true;
             ButtonClipping.IsEnabled = true;
             ButtonFillColor.IsEnabled = true;
+            ButtonFloodFill.IsEnabled = false;
+            if (CurrentEditableShape != null)
+            {
+                CurrentEditableShape.EditModeStop();
+                CurrentEditableShape = null;
+            }
+            if (MyBitmap.ClippingShape != null)
+            {
+                MyBitmap.ClippingShape.ClippingModeStop();
+            }
+        }
+        private void FillPattern_Click(object sender, RoutedEventArgs e)
+        {
+            current_drawing = 10;
+            ButtonPoint.IsEnabled = true;
+            ButtonLine.IsEnabled = true;
+            ButtonCircle.IsEnabled = true;
+            ButtonPolygon.IsEnabled = true;
+            ButtonEdit.IsEnabled = true;
+            ButtonDelete.IsEnabled = true;
+            ButtonCapsule.IsEnabled = true;
+            ButtonRectangle.IsEnabled = true;
+            ButtonClipping.IsEnabled = true;
+            ButtonFillColor.IsEnabled = false;
+            ButtonFloodFill.IsEnabled = true;
             if (CurrentEditableShape != null)
             {
                 CurrentEditableShape.EditModeStop();
@@ -934,7 +970,12 @@ namespace CG_Project_IV
                     poly.Draw();
                 }
             }
-        }     
+        }
+        private void FloodFilling(int x, int y)
+        {
+            Color oldColor = MyBitmap.GetColor(x, y);
+            FillingAlgorithms.FloodFill(x, y, oldColor, FillingColor);
+        }
         private void CheckBox_Checked_Clipping(object sender, RoutedEventArgs e)
         {
             MyBitmap.clipping = true;

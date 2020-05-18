@@ -60,6 +60,12 @@ namespace CG_Project_IV
         {
             return new Color(this.A, this.R, this.G, this.B);
         }
+        public bool Equals(Color color)
+        {
+            if (this.A == color.A && this.R == color.R && this.G == color.G && this.B == color.B)
+                return true;
+            return false;
+        }
     }
     [Serializable]
     public abstract class IShape

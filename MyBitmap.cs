@@ -302,5 +302,23 @@ namespace CG_Project_IV
         {
             return Math.Sqrt(Math.Pow(x1 - x2, 2) + Math.Pow(y1-y2, 2));
         }
+
+        internal static Color GetColor(int x, int y)
+        {
+            var color = new Color();
+            if (x < 0 || y < 0 || x >= Bitmap.PixelWidth || y >= Bitmap.PixelHeight)
+                return color;
+            unsafe
+            {
+                IntPtr pBackBuffer = Bitmap.BackBuffer + y * Bitmap.BackBufferStride + x * 4;
+
+                int color_data = *((int*)pBackBuffer);
+                color.B = (int)((color_data & 0x000000FF) >> 0);
+                color.G = (int)((color_data & 0x0000FF00) >> 8);
+                color.R = (int)((color_data & 0x00FF0000) >> 16);
+                color.A = (int)((color_data & 0xFF000000) >> 24);
+            }
+            return color;
+        }
     }
 }

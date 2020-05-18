@@ -2,6 +2,7 @@
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Drawing;
+using System.Collections;
 
 namespace CG_Project_IV
 {
@@ -203,6 +204,26 @@ namespace CG_Project_IV
                     AET[j] = (AET[j].Item1, AET[j].Item2 + AET[j].Item3, AET[j].Item3);
             }
             pattern.UnlockBits(bData);
+            MyBitmap.Bitmap.Unlock();
+        }
+        public static void FloodFill(int x, int y, Color oldColor, Color newColor)
+        {
+            Stack<Point> myStack = new Stack<Point>();
+            myStack.Push(new Point(x, y));
+            MyBitmap.Bitmap.Lock();
+            while(myStack.Count != 0)
+            {
+                var element = myStack.Pop();
+                var col = MyBitmap.GetColor(element.X, element.Y);
+                if (col.Equals(oldColor))
+                {
+                    MyBitmap.DrawPixel(element.X, element.Y, newColor);
+                    myStack.Push(new Point(element.X + 1, element.Y));
+                    myStack.Push(new Point(element.X - 1, element.Y));
+                    myStack.Push(new Point(element.X, element.Y + 1));
+                    myStack.Push(new Point(element.X, element.Y - 1));
+                }                   
+            }
             MyBitmap.Bitmap.Unlock();
         }
     }
