@@ -6,17 +6,17 @@
         xmlns:local="clr-namespace:CG_Project_V"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
-        Title="CG_Project_IV" Height="480" Width="660" MinHeight="500" MinWidth="640"
+        Title="CG_Project_V" Height="480" Width="660" MinHeight="500" MinWidth="640"
+                ContentRendered="Window_ContentRendered"
+        SizeChanged="Window_SizeChanged"
         >
     <Grid x:Name="MyGrid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"></ColumnDefinition>
             <ColumnDefinition Width="210"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <Canvas x:Name="MyCanvas" Grid.Column="0" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                Width="{Binding ActualWidth, ElementName=InfoCanvas}"
-                Height="{Binding ActualHeight, ElementName=InfoCanvas}">
-        </Canvas>
+        <Image x:Name="image" Grid.Row="2" Stretch="Fill"  Grid.Column="0"
+            MouseMove="Image_MouseMove"/>
         <Grid Grid.Column="2" Background="LightGray">
             <Grid.RowDefinitions>
                 <RowDefinition Height="30"></RowDefinition>
@@ -25,10 +25,16 @@
                 <RowDefinition Height="90"></RowDefinition>
                 <RowDefinition Height="30"></RowDefinition>
                 <RowDefinition Height="30"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="30"></RowDefinition>
             </Grid.RowDefinitions>
             <Button Content="Draw" Grid.Row="0" Click="DrawButton_Click" Margin="5,5,5,5"></Button>
-            <Button Content="Erase" Grid.Row="1" Click="EraseButton_Click" Margin="5"/>
-            <Label Content="Control" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center"></Label>
+            <Button Content="Erase All" Grid.Row="1" Click="EraseAllButton_Click" Margin="5"/>
+            <DockPanel Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Label Content="Control"></Label>
+                <ComboBox Name="ComboBoxControll" Width="40" Margin="5,5,5,5" SelectionChanged="ControllComboBox_SelectionChanged">
+                </ComboBox>
+            </DockPanel>
             <Grid Grid.Row="3">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="70"></ColumnDefinition>
@@ -52,7 +58,28 @@
 
                 <ComboBox x:Name="DistanceComboBox" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" Margin="10,4,10,0" Width="50" SelectionChanged="DistanceComboBox_SelectionChanged" Height="22" VerticalAlignment="Top"/>
             </Grid>
-            <Button Content="Start Animation" Name="AnimationButton" Grid.Row="4" Click="AnimationButton_Click" Margin="5,5,5,5"></Button>
+            <Button Content="Start Animation" Name="AnimationButton" Grid.Row="5" Click="AnimationButton_Click" Margin="5,5,5,5"></Button>
+            <Button Content="Erase" Name="Erase" Grid.Row="4" Click="EraseButton_Click" Margin="5,5,5,5"></Button>
+
+            <Grid Grid.Row="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <DockPanel Grid.Column="0">
+                    <TextBlock FontSize="10" Text="X " VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10,0,10,0"/>
+                    <TextBlock FontSize="10" x:Name="MouseX" Text="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,5,0"/>
+                </DockPanel>
+                <DockPanel Grid.Column="1">
+                    <TextBlock FontSize="10" Text="Y " VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10,0,10,0"/>
+                    <TextBlock FontSize="10" x:Name="MouseY" Text="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,5,0"/>
+                </DockPanel>
+                <DockPanel Grid.Column="2">
+                    <TextBlock FontSize="10" Text="Z " VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10,0,10,0"/>
+                    <TextBlock FontSize="10" x:Name="MouseZ" Text="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,5,0"/>
+                </DockPanel>
+            </Grid>
         </Grid>
     </Grid>
 </Window>

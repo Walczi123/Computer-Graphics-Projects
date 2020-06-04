@@ -11,8 +11,8 @@ namespace CG_Project_V
         public double distance = 10;
         public double alpha = 0;
         public double beta = 0;
-        public double width = 450 / 2;
-        public double height = 450 / 2;
+        public double width = 200;
+        public double height = 200;
         public double hori = 0;
     }
 }
