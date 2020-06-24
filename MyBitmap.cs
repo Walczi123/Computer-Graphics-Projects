@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -33,40 +32,18 @@ namespace CG_Project_V
                 for (int j = 0; j < Bitmap.Height; j++)
                     MyBitmap.ZBuffer[i, j] = -10;
         }
-        internal static HashSet<(int, int)> DrawPoint(int x, int y, Color color)
+        internal static void DrawLine(int x1, int y1, int x2, int y2, Color color)
         {
-            HashSet<(int, int)> result;
             Bitmap.Lock();
-            result = new HashSet<(int, int)>() { (x, y) };
-            MyBitmap.DrawPixel(x, y, color);         
+            Algorithms.lineDDA(x1, y1, x2, y2, color);
             Bitmap.Unlock();
-            return result;
-        }
-        internal static HashSet<(int, int)> DrawPoint(int x, int y)
-        {
-            HashSet<(int, int)> result;
-            Bitmap.Lock();
-            result = new HashSet<(int, int)>() { (x, y) };
-            MyBitmap.DrawPixel(x, y, Color.FromRgb(0, 0, 0));
-            Bitmap.Unlock();
-            return result;
-        }
-        internal static HashSet<(int, int)> DrawLine(int x1, int y1, int x2, int y2, Color color)
-        {
-            HashSet<(int, int)> result;
-            Bitmap.Lock();
-            result = Algorithms.lineDDA(x1, y1, x2, y2, color);
-            Bitmap.Unlock();
-            return result;
         }
 
-        internal static HashSet<(int, int)> DrawLine(int x1, int y1, int x2, int y2)
+        internal static void DrawLine(int x1, int y1, int x2, int y2)
         {
-            HashSet<(int, int)> result;
             Bitmap.Lock();
-            result = Algorithms.lineDDA(x1, y1, x2, y2, Color.FromRgb(0,0,0));
+            Algorithms.lineDDA(x1, y1, x2, y2, Color.FromRgb(0,0,0));
             Bitmap.Unlock();
-            return result;
         }
 
         internal static void DrawPixel(int x, int y, Color color)

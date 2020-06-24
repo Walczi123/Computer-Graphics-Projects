@@ -27,6 +27,7 @@
                 <RowDefinition Height="30"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
                 <RowDefinition Height="30"></RowDefinition>
+                <RowDefinition Height="30"></RowDefinition>
             </Grid.RowDefinitions>
             <Button Content="Draw" Grid.Row="0" Click="DrawButton_Click" Margin="5,5,5,5"></Button>
             <Button Content="Erase All" Grid.Row="1" Click="EraseAllButton_Click" Margin="5"/>
@@ -61,6 +62,7 @@
             <Button Content="Start Animation" Name="AnimationButton" Grid.Row="5" Click="AnimationButton_Click" Margin="5,5,5,5"></Button>
             <Button Content="Erase" Name="Erase" Grid.Row="4" Click="EraseButton_Click" Margin="5,5,5,5"></Button>
 
+            <Button Content="Project Example" Name="ProjectExample" Grid.Row="7" Click="ProjectExampleButton_Click" Margin="5,5,5,5"></Button>
             <Grid Grid.Row="10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>

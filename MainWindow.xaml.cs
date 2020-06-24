@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Timers;
+using System.Threading;
 using System.Windows;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace CG_Project_V
@@ -205,7 +201,7 @@ namespace CG_Project_V
         {
             dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
             dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 1);
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 2);
         }
         private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
@@ -243,6 +239,26 @@ namespace CG_Project_V
                 else
                     MouseZ.Text = "-";
             }   
+        }
+
+        private void ProjectExampleButton_Click(object sender, RoutedEventArgs e)
+        {
+            Cube c1 = new Cube(1);
+            Thread.Sleep(20); //sleep to random new colors
+            Cube c2 = new Cube(1);
+            MyBitmap.drawingCubes.Add(c1);
+            MyBitmap.drawingCubes.Add(c2);
+            c1.camera.alpha = Math.PI / 8;
+            c1.camera.beta = Math.PI / 4;
+            c1.camera.hori -= 15;
+            c1.camera.alpha += Math.PI / 8;
+            c2.camera.beta -= Math.PI / 16;
+            c2.camera.hori += 15;
+            MyBitmap.Redraw();
+            ComboBoxControll.Items.Add(ComboBoxControll.Items.Count + 1);
+            ComboBoxControll.Items.Add(ComboBoxControll.Items.Count + 1);
+            ComboBoxControll.SelectedIndex = ComboBoxControll.Items.IndexOf(ComboBoxControll.Items.Count);
+            EditingCube = c2;
         }
     }
 }
