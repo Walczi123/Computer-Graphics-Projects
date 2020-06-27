@@ -33,7 +33,7 @@ namespace CG_Project_V
     public class Cube
     {        
         private List<Face> Faces = new List<Face>();
-        public Camera camera = new Camera();
+        public Transformation transformation = new Transformation();
         public Cube(double val)
         {
             Random r = new Random();
@@ -59,7 +59,7 @@ namespace CG_Project_V
         public void Draw()
         {
             foreach (var f in Faces)
-                f.Draw(camera);
+                f.Draw(transformation);
         }
         public double MaxX()
         {

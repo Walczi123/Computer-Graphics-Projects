@@ -57,11 +57,11 @@ namespace CG_Project_V
             return (a, b, c, d);
         }
 
-        public static void Transofrm(List<Vertex> vertices, Camera camera)
+        public static void Transofrm(List<Vertex> vertices, Transformation transformation)
         {
-            double a = camera.alpha;
-            double b = camera.beta;
-            double s = camera.width * (1 / Math.Tan(Math.PI / 8));
+            double a = transformation.alpha;
+            double b = transformation.beta;
+            double s = Camera.width * (1 / Math.Tan(Math.PI / 8));
             Matrix4x4 Ry = new Matrix4x4((float)Math.Cos(a), 0, (float)Math.Sin(a), 0,
                                         0, 1, 0, 0,
                                         (float)-Math.Sin(a), 0, (float)Math.Cos(a), 0,
@@ -70,73 +70,50 @@ namespace CG_Project_V
                                         0, (float)Math.Cos(b), (float)Math.Sin(b), 0,
                                         0, (float)-Math.Sin(b), (float)Math.Cos(b), 0,
                                         0, 0, 0, 1  );
-            Matrix4x4 Tz = new Matrix4x4(1, 0, 0, 0,
-                                        0, 1, 0, 0,
-                                        0, 0, 1, (float)camera.distance,
-                                        0, 0, 0, 1  );
-            Matrix4x4 P  = new Matrix4x4((float)s, 0, (float)camera.width, 0,
-                                        0, (float)s, (float)camera.height, 0,
+            //Matrix4x4 Tz = new Matrix4x4(1, 0, 0, 0,
+            //                            0, 1, 0, 0,
+            //                            0, 0, 1, (float)Camera.distance,
+            //                            0, 0, 0, 1  );
+            Matrix4x4 P  = new Matrix4x4((float)s, 0, (float)(Camera.width), 0,
+                                        0, (float)s, (float)(Camera.height), 0,
                                         0, 0, 0, 1,
                                         0, 0, 1, 0  );
-            Matrix4x4 result = P * Tz * Rx * Ry;
+            Matrix4x4 M = Camera.Matrix();
+            Matrix4x4 result1 = Rx * Ry;
+            //Matrix4x4 result2 = P * M * Tz;
+            Matrix4x4 result2 = P * M;
             double x, y, z, d;
             foreach (var ver in vertices)
             {
+                //rotate about the origin
                 x = ver.X;
                 y = ver.Y;
                 z = ver.Z;
-                d = ver.D;
-                ver.X = result.M11 * x + result.M12 * y + result.M13 * z + result.M14 * d;
-                ver.Y = result.M21 * x + result.M22 * y + result.M23 * z + result.M24 * d;
-                ver.Z = result.M31 * x + result.M32 * y + result.M33 * z + result.M34 * d;
-                ver.D = result.M41 * x + result.M42 * y + result.M43 * z + result.M44 * d;
+                d = ver.D;              
+                ver.X = result1.M11 * x + result1.M12 * y + result1.M13 * z + result1.M14 * d;
+                ver.Y = result1.M21 * x + result1.M22 * y + result1.M23 * z + result1.M24 * d;
+                ver.Z = result1.M31 * x + result1.M32 * y + result1.M33 * z + result1.M34 * d;
+                ver.D = result1.M41 * x + result1.M42 * y + result1.M43 * z + result1.M44 * d;
+
+                //move
+                ver.X += transformation.hori;
+                ver.Y += transformation.vert;
+
+                //projection and distance
+                x = ver.X;
+                y = ver.Y;
+                z = ver.Z;
+                d = ver.D;               
+                ver.X = result2.M11 * x + result2.M12 * y + result2.M13 * z + result2.M14 * d;
+                ver.Y = result2.M21 * x + result2.M22 * y + result2.M23 * z + result2.M24 * d;
+                ver.Z = result2.M31 * x + result2.M32 * y + result2.M33 * z + result2.M34 * d;
+                ver.D = result2.M41 * x + result2.M42 * y + result2.M43 * z + result2.M44 * d;
 
                 ver.X /= ver.D;
                 ver.Y /= ver.D;
                 ver.Z /= ver.D;
-
-                ver.X += camera.hori;
             }
         }
-
-        //public static void Transofrm(List<Vertex> vertices, Camera camera)
-        //{
-        //    double a = camera.alpha;
-        //    double b = camera.beta;
-        //    double s = camera.width * (1 / Math.Tan(Math.PI / 8));
-        //    foreach (var ver in vertices)
-        //    {
-
-        //        double x, y, z, d;
-        //        //Rx
-        //        y = ver.Y;
-        //        z = ver.Z;
-        //        ver.Y = Math.Cos(b) * y + Math.Sin(b) * z;
-        //        ver.Z = -Math.Sin(b) * y + Math.Cos(b) * z;
-        //        //Ry
-        //        x = ver.X;
-        //        z = ver.Z;
-        //        ver.X = Math.Cos(a) * x + Math.Sin(a) * z;
-        //        ver.Z = -Math.Sin(a) * x + Math.Cos(a) * z;
-        //        //Tz
-        //        ver.Z += camera.distance;
-        //        //P
-        //        x = ver.X;
-        //        y = ver.Y;
-        //        z = ver.Z;
-        //        d = ver.D;
-        //        //ver.X = s * x + camera.width * z;
-        //        ver.Y = s * y + camera.height * z;
-        //        ver.Z = d;
-        //        ver.D = z;
-
-        //        ver.X /= ver.D;
-        //        ver.Y /= ver.D;
-        //        ver.Z /= ver.D;
-
-        //        ver.X += camera.hori;
-        //    }
-        //}
 
         public static Vertex LowwerY(Vertex p1, Vertex p2)
         {
@@ -147,6 +124,24 @@ namespace CG_Project_V
         {
             if (p1.Y >= p2.Y) return p1;
             return p2;
+        }
+
+        public static double LengthOfVector((double, double, double) vec)
+        {
+            return Math.Pow(Math.Pow(vec.Item1,2) + Math.Pow(vec.Item2, 2) + Math.Pow(vec.Item3, 2), (double)1/3);
+        }
+
+        public static (double, double, double) CrossProdOfVectors((double, double, double) vec1, (double, double, double) vec2)
+        {
+            (double, double, double) result = ((vec1.Item2 * vec2.Item3) - (vec1.Item3 * vec2.Item2),
+                                            (vec1.Item3 * vec2.Item1) - (vec1.Item1 * vec2.Item3),
+                                            (vec1.Item1 * vec2.Item2) - (vec1.Item2 * vec2.Item1));
+            return result;
+        }
+        public static double MultiplicationOfVectors((double, double, double) vec1, (double, double, double) vec2)
+        {
+            double result = vec1.Item1 * vec2.Item1 + vec1.Item2 * vec2.Item2 + vec1.Item3 * vec2.Item3;
+            return result;
         }
     }
 }

@@ -14,17 +14,19 @@ namespace CG_Project_V
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Camera camera = new Camera();
-        private int hChange = 10;
-        private int wChange = 10;        
+        private int hChange = 1;
+        private int wChange = 1;
+        private int leftBound = -10;
+        private int rightBound = 10;
+        private double vel = 0.2;
         private double rotHorChange = Math.PI / 16;
         private double rotVerChange = Math.PI / 16;
         private static DispatcherTimer dispatcherTimer;
-        private double Vx = 2;
-        private double Vy = 1;
+        //private double Vx = 0.05;
+        //private double Vy = 0.05;
         private WriteableBitmap bitmap = new WriteableBitmap(100, 100, 96, 96, System.Windows.Media.PixelFormats.Bgra32, BitmapPalettes.Halftone256);
         private Cube EditingCube = null;
-        private List<Cube> AnimationList = new List<Cube>();
+        //private List<Cube> AnimationList = new List<Cube>();
 
         public MainWindow()
         {
@@ -66,7 +68,7 @@ namespace CG_Project_V
         {
             if (DistanceComboBox.SelectedItem != null && EditingCube!=null)
             {
-                EditingCube.camera.distance = Int32.Parse(DistanceComboBox.SelectedItem.ToString());
+                Camera.distance = Int32.Parse(DistanceComboBox.SelectedItem.ToString());
                 MyBitmap.Redraw();
             }
         }        
@@ -76,14 +78,14 @@ namespace CG_Project_V
             {
                 var i = Int32.Parse(ComboBoxControll.SelectedItem.ToString());
                 EditingCube = MyBitmap.drawingCubes[i - 1];
-                if (AnimationList.Contains(EditingCube))
-                {
-                    AnimationButton.Content = "Stop Animation";
-                }
-                else
-                {
-                    AnimationButton.Content = "Start Animation";
-                }
+                //if (AnimationList.Contains(EditingCube))
+                //{
+                //    AnimationButton.Content = "Stop Animation";
+                //}
+                //else
+                //{
+                //    AnimationButton.Content = "Start Animation";
+                //}
             }
         }
         private void EraseAllButton_Click(object sender, RoutedEventArgs e)
@@ -95,7 +97,7 @@ namespace CG_Project_V
             }
             MyBitmap.CleanDrawArea();
             MyBitmap.drawingCubes = new List<Cube>();
-            AnimationList.Clear();
+            //AnimationList.Clear();
             ComboBoxControll.Items.Clear();
         }
         private void EraseButton_Click(object sender, RoutedEventArgs e)
@@ -108,7 +110,7 @@ namespace CG_Project_V
                     dispatcherTimer.Stop();
                 }
                 MyBitmap.drawingCubes.Remove(EditingCube);
-                AnimationList.Remove(EditingCube);
+                //AnimationList.Remove(EditingCube);
                 int selected = ComboBoxControll.SelectedIndex;
                 ComboBoxControll.Items.RemoveAt(selected);
                 MyBitmap.Redraw();
@@ -124,107 +126,122 @@ namespace CG_Project_V
         private void UpButton_Click(object sender, RoutedEventArgs e)
         {
             if(EditingCube!=null)
-                EditingCube.camera.height -= hChange;
+                EditingCube.transformation.vert -= hChange;
             MyBitmap.Redraw();
         }
 
         private void DownButton_Click(object sender, RoutedEventArgs e)
         {
             if (EditingCube != null)
-                EditingCube.camera.height += hChange;
+                EditingCube.transformation.vert += hChange;
             MyBitmap.Redraw();
         }
 
         private void RightButton_Click(object sender, RoutedEventArgs e)
         {
             if (EditingCube != null)
-                EditingCube.camera.hori += wChange;
+                EditingCube.transformation.hori += wChange;
             MyBitmap.Redraw();
         }
 
         private void LeftButton_Click(object sender, RoutedEventArgs e)
         {
             if (EditingCube != null)
-                EditingCube.camera.hori -= wChange;
+                EditingCube.transformation.hori -= wChange;
             MyBitmap.Redraw();
         }
 
         private void RotDownButton_Click(object sender, RoutedEventArgs e)
         {
             if (EditingCube != null)
-                EditingCube.camera.beta -= rotHorChange;
+                EditingCube.transformation.beta -= rotHorChange;
             MyBitmap.Redraw();
         }
 
         private void RotUpButton_Click(object sender, RoutedEventArgs e)
         {
             if (EditingCube != null)
-                EditingCube.camera.beta += rotHorChange;
+                EditingCube.transformation.beta += rotHorChange;
             MyBitmap.Redraw();
         }
 
         private void RotRightButton_Click(object sender, RoutedEventArgs e)
         {
             if (EditingCube != null)
-                EditingCube.camera.alpha += rotVerChange;
+                EditingCube.transformation.alpha += rotVerChange;
             MyBitmap.Redraw();
         }
 
         private void RotLeftButton_Click(object sender, RoutedEventArgs e)
         {
             if (EditingCube != null)
-                EditingCube.camera.alpha -= rotVerChange;
+                EditingCube.transformation.alpha -= rotVerChange;
             MyBitmap.Redraw();
         }
 
         private void AnimationButton_Click(object sender, RoutedEventArgs e)
         {
-            if (EditingCube != null)
+            if (!dispatcherTimer.IsEnabled)
             {
-                if (!AnimationList.Contains(EditingCube))
-                {
-                    AnimationButton.Content = "Stop Animation";
-                    AnimationList.Add(EditingCube);
-                    if (!dispatcherTimer.IsEnabled && AnimationList.Count == 1)
-                        dispatcherTimer.Start();
-                }
-                else
-                {
-                    AnimationButton.Content = "Start Animation";
-                    AnimationList.Remove(EditingCube);
-                    if (dispatcherTimer.IsEnabled && AnimationList.Count == 0)
-                        dispatcherTimer.Stop();
-                }
+                dispatcherTimer.Start();
+                AnimationButton.Content = "Stop Animation";
+            }          
+            else
+            {
+                dispatcherTimer.Stop();
+                AnimationButton.Content = "Start Animation";
             }
+               
+            //if (EditingCube != null)
+            //{
+            //    if (!AnimationList.Contains(EditingCube))
+            //    {
+            //        AnimationButton.Content = "Stop Animation";
+            //        AnimationList.Add(EditingCube);
+            //        if (!dispatcherTimer.IsEnabled && AnimationList.Count == 1)
+            //            dispatcherTimer.Start();
+            //    }
+            //    else
+            //    {
+            //        AnimationButton.Content = "Start Animation";
+            //        AnimationList.Remove(EditingCube);
+            //        if (dispatcherTimer.IsEnabled && AnimationList.Count == 0)
+            //            dispatcherTimer.Stop();
+            //    }
+            //}
         }
         private void SetTimer()
         {
             dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
             dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 2);
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 10);
         }
         private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
-            foreach(var cube in AnimationList) { 
-                cube.camera.alpha -= Math.PI / 180;
-                cube.camera.beta -= Math.PI / 360;
-                double maxX = cube.MaxX();
-                double maxY = cube.MaxY();
-                double minX = cube.MinX();
-                double minY = cube.MinY();
-                if (minX < 2)
-                    Vx = Math.Abs(Vx);
-                if (maxX > image.ActualWidth - 2)
-                    Vx = -Math.Abs(Vx);
-                if (minY < 2)
-                    Vy = Math.Abs(Vy);
-                if (maxY > image.ActualHeight - 2)
-                    Vy = -Math.Abs(Vy);
-                cube.camera.height += Vy;
-                cube.camera.hori += Vx;
+            if(Camera.x <= leftBound) vel = Math.Abs(vel);
+            if(Camera.x >= rightBound) vel = -Math.Abs(vel);
+            Camera.x += vel;
+            MyBitmap.Redraw();
+            //foreach(var cube in AnimationList) { 
+            //    cube.transformation.alpha -= Math.PI / 180;
+            //    cube.transformation.beta -= Math.PI / 360;
+            //    double maxX = cube.MaxX();
+            //    double maxY = cube.MaxY();
+            //    double minX = cube.MinX();
+            //    double minY = cube.MinY();
+            //    if (minX < 2)
+            //        Vx = Math.Abs(Vx);
+            //    if (maxX > image.ActualWidth - 2)
+            //        Vx = -Math.Abs(Vx);
+            //    if (minY < 2)
+            //        Vy = Math.Abs(Vy);
+            //    if (maxY > image.ActualHeight - 2)
+            //        Vy = -Math.Abs(Vy);
+            //    cube.transformation.vert += Vy;
+            //    cube.transformation.hori += Vx;
 
-                MyBitmap.Redraw();
-            }
+            //    MyBitmap.Redraw();
+            //}
         }
 
         private void Image_MouseMove(object sender, MouseEventArgs e)
@@ -248,17 +265,75 @@ namespace CG_Project_V
             Cube c2 = new Cube(1);
             MyBitmap.drawingCubes.Add(c1);
             MyBitmap.drawingCubes.Add(c2);
-            c1.camera.alpha = Math.PI / 8;
-            c1.camera.beta = Math.PI / 4;
-            c1.camera.hori -= 15;
-            c1.camera.alpha += Math.PI / 8;
-            c2.camera.beta -= Math.PI / 16;
-            c2.camera.hori += 15;
+            c1.transformation.alpha = Math.PI / 8;
+            c1.transformation.beta = Math.PI / 4;
+            c1.transformation.hori -= 0.5;
+            c1.transformation.alpha += Math.PI / 8;
+            c2.transformation.beta -= Math.PI / 16;
+            c2.transformation.hori += 0.5;
             MyBitmap.Redraw();
             ComboBoxControll.Items.Add(ComboBoxControll.Items.Count + 1);
             ComboBoxControll.Items.Add(ComboBoxControll.Items.Count + 1);
             ComboBoxControll.SelectedIndex = ComboBoxControll.Items.IndexOf(ComboBoxControll.Items.Count);
             EditingCube = c2;
+        }
+
+        private void UpButtonCamera_Click(object sender, RoutedEventArgs e)
+        {
+            Camera.y += 1;           
+            MyBitmap.Redraw();
+        }
+
+        private void DownButtonCamera_Click(object sender, RoutedEventArgs e)
+        {
+            Camera.y -= 1;
+            MyBitmap.Redraw();
+        }
+
+        private void RightButtonCamera_Click(object sender, RoutedEventArgs e)
+        {
+            Camera.x -= 1;
+            MyBitmap.Redraw();
+        }
+
+        private void LeftButtonCamera_Click(object sender, RoutedEventArgs e)
+        {
+            Camera.x += 1;
+            MyBitmap.Redraw();
+        }
+
+        private void RotDownButtonCamera_Click(object sender, RoutedEventArgs e)
+        {
+            Camera.targetY -=1;
+            MyBitmap.Redraw();
+        }
+
+        private void RotUpButtonCamera_Click(object sender, RoutedEventArgs e)
+        {
+            Camera.targetY += 1;
+            MyBitmap.Redraw();
+        }
+
+        private void RotRightButtonCamera_Click(object sender, RoutedEventArgs e)
+        {
+            Camera.targetX -= 1;
+            MyBitmap.Redraw();
+        }
+
+        private void RotLeftButtonCamera_Click(object sender, RoutedEventArgs e)
+        {
+            Camera.targetX += 1;
+            MyBitmap.Redraw();
+        }
+
+        private void ResetCameraButton_Click(object sender, RoutedEventArgs e)
+        {
+            Camera.y = 0;
+            Camera.x = 0;
+            Camera.distance = 10;
+            Camera.targetX = Math.PI / 2;
+            Camera.targetY = Math.PI / 2;
+            MyBitmap.Redraw();
         }
     }
 }

@@ -16,10 +16,10 @@ namespace CG_Project_V
             triangleB = new Triangle(a, d, c);
             color = col;
         }
-        public void Draw(Camera camera)
+        public void Draw(Transformation transformation)
         {
-            triangleA.Draw(color, camera);
-            triangleB.Draw(color, camera);
+            triangleA.Draw(color, transformation);
+            triangleB.Draw(color, transformation);
         }
         public double MaxX()
         {
@@ -82,10 +82,10 @@ namespace CG_Project_V
             for (int i = 0; i < 3; i++)
                 Vertices[i].Change(VerticesPattern[i]);
         }
-        public void Draw(Color color, Camera camera)
+        public void Draw(Color color, Transformation transformation)
         {
             ResetVertices();
-            Algorithms.Transofrm(Vertices, camera);
+            Algorithms.Transofrm(Vertices, transformation);
             var PlaneEquation = Algorithms.ComputePlaneEquation(this.Vertices[0], this.Vertices[1], this.Vertices[2]);
             double a = PlaneEquation.Item1, b = PlaneEquation.Item2, c = PlaneEquation.Item3, d = PlaneEquation.Item4;
             if (c == 0)

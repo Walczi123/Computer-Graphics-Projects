@@ -24,18 +24,21 @@
                 <RowDefinition Height="30"></RowDefinition>
                 <RowDefinition Height="90"></RowDefinition>
                 <RowDefinition Height="30"></RowDefinition>
+                <RowDefinition Height="90"></RowDefinition>
+                <RowDefinition Height="30"></RowDefinition>
+                <RowDefinition Height="30"></RowDefinition>
                 <RowDefinition Height="30"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
                 <RowDefinition Height="30"></RowDefinition>
                 <RowDefinition Height="30"></RowDefinition>
             </Grid.RowDefinitions>
-            <Button Content="Draw" Grid.Row="0" Click="DrawButton_Click" Margin="5,5,5,5"></Button>
+            <Button Content="Draw Cube" Grid.Row="0" Click="DrawButton_Click" Margin="5,5,5,5"></Button>
             <Button Content="Erase All" Grid.Row="1" Click="EraseAllButton_Click" Margin="5"/>
             <DockPanel Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Label Content="Control"></Label>
-                <ComboBox Name="ComboBoxControll" Width="40" Margin="5,5,5,5" SelectionChanged="ControllComboBox_SelectionChanged">
-                </ComboBox>
+                <Label Content="Control Cube"></Label>
+                <ComboBox Name="ComboBoxControll" Width="40" Margin="5,5,5,5" SelectionChanged="ControllComboBox_SelectionChanged"/>
             </DockPanel>
+
             <Grid Grid.Row="3">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="70"></ColumnDefinition>
@@ -57,13 +60,38 @@
                 <Button Content="Rot. Left" Grid.Column="0" Grid.Row="2" Click="RotLeftButton_Click" Margin="5,5,5,5"></Button>
                 <Button Content="Rot. Right" Grid.Column="2" Grid.Row="2" Click="RotRightButton_Click" Margin="5,5,5,5"></Button>
 
+                <!--<ComboBox x:Name="DistanceComboBox" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" Margin="10,4,10,0" Width="50" SelectionChanged="DistanceComboBox_SelectionChanged" Height="22" VerticalAlignment="Top"/>-->
+            </Grid>
+            <Label Content="Control Camera" Grid.Row="4" HorizontalAlignment="Center" VerticalAlignment="Center" ></Label>
+            <Grid Grid.Row="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="70"></ColumnDefinition>
+                    <ColumnDefinition Width="70"></ColumnDefinition>
+                    <ColumnDefinition Width="70"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"></RowDefinition>
+                    <RowDefinition Height="30"></RowDefinition>
+                    <RowDefinition Height="30"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Button FontFamily="Marlett" FontSize="20" Content="5" Grid.Column="1" Grid.Row="0" Click="UpButtonCamera_Click" Margin="5,5,5,0" Height="20" VerticalAlignment="Top"></Button>
+                <Button FontFamily="Marlett" FontSize="20" Content="6" Grid.Column="1" Grid.Row="2" Click="DownButtonCamera_Click" Margin="5,5,5,5"></Button>
+                <Button FontFamily="Marlett" FontSize="20" Content="3" Grid.Column="0" Grid.Row="1" Click="LeftButtonCamera_Click" Margin="5,5,5,5"></Button>
+                <Button FontFamily="Marlett" FontSize="20" Content="4" Grid.Column="2" Grid.Row="1" Click="RightButtonCamera_Click" Margin="5,5,5,5"></Button>
+
+                <Button Content="Rot. Up"  Grid.Column="2" Grid.Row="0" Click="RotUpButtonCamera_Click" Margin="5,5,5,5"></Button>
+                <Button Content="Rot. Down" Grid.Column="0" Grid.Row="0" Click="RotDownButtonCamera_Click" Margin="5,5,5,5"></Button>
+                <Button Content="Rot. Left" Grid.Column="0" Grid.Row="2" Click="RotLeftButtonCamera_Click" Margin="5,5,5,5"></Button>
+                <Button Content="Rot. Right" Grid.Column="2" Grid.Row="2" Click="RotRightButtonCamera_Click" Margin="5,5,5,5"></Button>
+
                 <ComboBox x:Name="DistanceComboBox" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" Margin="10,4,10,0" Width="50" SelectionChanged="DistanceComboBox_SelectionChanged" Height="22" VerticalAlignment="Top"/>
             </Grid>
-            <Button Content="Start Animation" Name="AnimationButton" Grid.Row="5" Click="AnimationButton_Click" Margin="5,5,5,5"></Button>
-            <Button Content="Erase" Name="Erase" Grid.Row="4" Click="EraseButton_Click" Margin="5,5,5,5"></Button>
-
-            <Button Content="Project Example" Name="ProjectExample" Grid.Row="7" Click="ProjectExampleButton_Click" Margin="5,5,5,5"></Button>
-            <Grid Grid.Row="10">
+            <Button Content="Reset Camara" Name="ResetCameraButton" Grid.Row="6" Click="ResetCameraButton_Click" Margin="5,5,5,5"></Button>
+            <Button Content="Start Animation" Name="AnimationButton" Grid.Row="7" Click="AnimationButton_Click" Margin="5,5,5,5"></Button>
+            <Button Content="Erase" Name="Erase" Grid.Row="8" Click="EraseButton_Click" Margin="5,5,5,5"></Button>
+            
+            <Button Content="Project Example" Name="ProjectExample" Grid.Row="10" Click="ProjectExampleButton_Click" Margin="5,5,5,5"></Button>
+            <Grid Grid.Row="11">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
