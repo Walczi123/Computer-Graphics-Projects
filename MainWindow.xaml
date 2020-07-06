@@ -1,0 +1,239 @@
+﻿<Window x:Class="CG_Project_II.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CG_Project_II"
+        mc:Ignorable="d"
+        Title="Computer Grapihcs Project I" Height="450" Width="800"
+        MinHeight="450" MinWidth="550">
+    <Grid x:Name="MainGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="0" Name="secondColumn"/>
+            <ColumnDefinition Width="150" Name="thirdColumn"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25" />
+            <RowDefinition Height="*" MinHeight="345"/>
+            <RowDefinition Height="0" Name="secondRow"/>
+            <RowDefinition Height="0" Name="thirdRow" MinHeight="0"/>
+        </Grid.RowDefinitions>
+        <DockPanel Grid.Row="0" Grid.ColumnSpan="3">
+            <Menu DockPanel.Dock="Top">
+                <MenuItem Header="_Options" Height="25">
+                    <MenuItem Header="_Load image" Click="loadImage" />
+                    <MenuItem Header="_Save image" Click="saveImage"/>
+                    <MenuItem Header="_Reset" Click="resetImage"/>
+                    <Separator />
+                    <MenuItem Header="_Exit" Click="shutdown"/>
+                </MenuItem>
+                <MenuItem Header="_Select Project" Height="25">
+                    <MenuItem Header="_Project I" Click="selectP1" />
+                    <MenuItem Header="_Project II" Click="selectP2"/>
+                </MenuItem>
+            </Menu>
+        </DockPanel>
+        <Grid Grid.Column="0" Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="20" />
+                <RowDefinition Height="20" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="20" />
+                <RowDefinition Height="50" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <DockPanel Grid.Column="0" Grid.Row="1">
+                <TextBlock Text="Orginal" HorizontalAlignment="Center"  VerticalAlignment="Center"/>
+            </DockPanel>
+            <DockPanel Grid.Column="1" Grid.Row="1">
+                <TextBlock Text="Result" HorizontalAlignment="Center"  VerticalAlignment="Center"/>
+            </DockPanel>
+            <DockPanel Grid.Column="0" Grid.Row="2">
+                <Border BorderThickness="2" BorderBrush="#FF000000" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,10,10,10">
+                    <Image x:Name="orginalImage" HorizontalAlignment="Left"  VerticalAlignment="Center"  
+                   Source=".\example.jpg"/>
+                </Border>
+            </DockPanel>
+            <DockPanel Grid.Column="1" Grid.Row="2">
+                <Border BorderThickness="2" BorderBrush="#FF000000" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,10,10,10">
+                    <Image x:Name="resultImage" HorizontalAlignment="Left"  VerticalAlignment="Center"  
+                   Source=".\example.jpg"/>
+                </Border>
+            </DockPanel>
+            <DockPanel Grid.Column="0" Grid.Row="4" HorizontalAlignment="Center">
+                <Button x:Name="loadButton" Content="Load Image" HorizontalAlignment="Center" VerticalAlignment="Center" Width="75" Click="loadImage" Margin="15,0,15,0"/>
+                <Button x:Name="saveButton" Content="Save Image" HorizontalAlignment="Center" VerticalAlignment="Center" Width="75" Click="saveImage" Margin="15,0,15,0"/>
+            </DockPanel>
+            <DockPanel Grid.Column="1" Grid.Row="4" >
+                <Button x:Name="resetButton" Content="Reset Image" HorizontalAlignment="Center" VerticalAlignment="Center" Width="75" Click="resetImage"/>
+            </DockPanel>
+        </Grid>
+        <Grid Grid.Column="1" Grid.Row="1" Background="#FFBAC0C5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="40" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <TextBlock HorizontalAlignment="Center" Text="Funtional Filters" VerticalAlignment="Center"/>
+            <Button Content="Inversion" HorizontalAlignment="Center"  Grid.Row="1" VerticalAlignment="Center" Width="140" Click="InversionButtonClick"/>
+            <Button Content="Brightness Correction" HorizontalAlignment="Center"  Grid.Row="2" VerticalAlignment="Center" Width="140" Click="BrightnessButtonClick"/>
+            <Button Content="Contrast Enhancement" HorizontalAlignment="Center"  Grid.Row="3" VerticalAlignment="Center" Width="140" Click="ContrastButtonClick"/>
+            <DockPanel Grid.Row="4">
+                <Button Content="Gamma Correction" HorizontalAlignment="Center" VerticalAlignment="Center"  Click="GammaButtonClick" Margin="10,0,0,0"/>
+                <TextBox x:Name="GammaValue" Width="20" Margin="0,5,0,5" PreviewTextInput="NumberValidationTextBox"></TextBox>
+            </DockPanel>
+            <TextBlock HorizontalAlignment="Center" Text="Convolution Filters" VerticalAlignment="Center" Grid.Row="5"/>
+            <Button Content="Blur" HorizontalAlignment="Center"  Grid.Row="6" VerticalAlignment="Center" Width="140" Click="BlurButtonClick"/>
+            <Button Content="Gaussian Blur" HorizontalAlignment="Center"  Grid.Row="7" VerticalAlignment="Center" Width="140" Click="GaussianBlurButtonClick"/>
+            <Button Content="Sharpen" HorizontalAlignment="Center"  Grid.Row="8" VerticalAlignment="Center" Width="140" Click="SharpenButtonClick"/>
+            <Button Content="Edge Detection" HorizontalAlignment="Center"  Grid.Row="9" VerticalAlignment="Center" Width="140" Click="EdgeDetectionButtonClick"/>
+            <Button Content="Emboss" HorizontalAlignment="Center"  Grid.Row="10" VerticalAlignment="Center" Width="140" Click="EmbossButtonClick"/>
+
+        </Grid>
+        <Grid Grid.Column="2" Grid.Row="1" Background="#FFBAC0C5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="40" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="40" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Label VerticalAlignment="Center" HorizontalAlignment="Center">Average Dithering</Label>
+            <TextBlock Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center">Color Variant</TextBlock>
+            <DockPanel Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" >
+                <TextBlock Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,0,0">R :</TextBlock>
+                <TextBox x:Name="ValuePerRed" Width="25" Margin="5,5,5,5" PreviewTextInput="OnlyNumbersValidationTextBox">2</TextBox>
+                <TextBlock Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center">G :</TextBlock>
+                <TextBox x:Name="ValuePerGreen" Width="25" Margin="5,5,5,5" PreviewTextInput="OnlyNumbersValidationTextBox">2</TextBox>
+                <TextBlock Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center">B :</TextBlock>
+                <TextBox x:Name="ValuePerBlue" Width="25" Margin="5,5,5,5" PreviewTextInput="OnlyNumbersValidationTextBox">2</TextBox>
+            </DockPanel>
+            <Button Grid.Row="3" Width="120" Content="Performe for Colors" HorizontalAlignment="Center" VerticalAlignment="Center"  Click="ColorDitheringClick" Margin="5,0,0,0"/>
+            <TextBlock Grid.Row="4" VerticalAlignment="Center" HorizontalAlignment="Center">Black-White Variant</TextBlock>
+            <Button Grid.Row="5" Width="135" Content="Convert to Black-White" HorizontalAlignment="Center" VerticalAlignment="Center"  Click="ConvertToBW" Margin="5,0,0,0"/>
+            <DockPanel Grid.Row="6" HorizontalAlignment="Center" VerticalAlignment="Center" >
+                <Button Content="Perform for BW" Width="100" HorizontalAlignment="Center" VerticalAlignment="Center"  Click="BWDitheringClick" Margin="5,0,0,0"/>
+                <TextBox x:Name="ValuePerChannel" Width="25" Margin="5,5,5,5" PreviewTextInput="OnlyNumbersValidationTextBox">2</TextBox>
+            </DockPanel>
+            <Label Grid.Row="7" VerticalAlignment="Center" HorizontalAlignment="Center">Color quantization</Label>
+            <DockPanel Grid.Row="8" HorizontalAlignment="Center" VerticalAlignment="Center" >
+                <Button Content="Median Cut" Width="80" HorizontalAlignment="Center" VerticalAlignment="Center"  Click="MedianCutClick" Margin="5,0,0,0"/>
+                <ComboBox x:Name="ComboCoxMedianCut" HorizontalAlignment="Center" VerticalAlignment="Center" Width="50" Height="26" Margin="5,5,5,5" SelectedIndex="0">
+                    <ComboBoxItem>2</ComboBoxItem>
+                    <ComboBoxItem>4</ComboBoxItem>
+                    <ComboBoxItem>8</ComboBoxItem>
+                    <ComboBoxItem>16</ComboBoxItem>
+                    <ComboBoxItem>32</ComboBoxItem>
+                    <ComboBoxItem>64</ComboBoxItem>
+                    <ComboBoxItem>128</ComboBoxItem>
+                    <ComboBoxItem>256</ComboBoxItem>
+                </ComboBox>
+            </DockPanel>
+            <Label Grid.Row="9" VerticalAlignment="Center" HorizontalAlignment="Center">Convert RGB into YCbCr</Label>
+            <DockPanel Grid.Row="10" HorizontalAlignment="Center" VerticalAlignment="Center" >
+                <Button Content="Y" Width="30"  HorizontalAlignment="Center" VerticalAlignment="Center"  Click="YClick" Margin="5,0,0,0"/>
+                <Button Content="Cb" Width="30" HorizontalAlignment="Center" VerticalAlignment="Center"  Click="CbClick" Margin="5,0,0,0"/>
+                <Button Content="Cr" Width="30" HorizontalAlignment="Center" VerticalAlignment="Center"  Click="CrClick" Margin="5,0,0,0"/>
+            </DockPanel>
+        </Grid>
+        <GridSplitter Grid.Row="2" Height="5" HorizontalAlignment="Stretch" Grid.ColumnSpan="2"/>
+        <Grid Grid.Column="1" Grid.Row="3" Background="#FFBAC0C5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <StackPanel  Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.429,-0.962">
+                <Label>Choose Kernel</Label>
+            </StackPanel>
+            <DockPanel Grid.Row="1">
+                <ComboBox x:Name="ComboBox" HorizontalAlignment="Center" Margin="0,0,0,0" Grid.Row="1" VerticalAlignment="Center" Width="130" SelectionChanged="ComboBox_SelectionChanged" SelectedIndex="0">
+                    <ComboBoxItem Name="custom">Custom</ComboBoxItem>
+                    <ComboBoxItem Name="blur">Blur</ComboBoxItem>
+                    <ComboBoxItem Name="gauss">Gaussian Blur</ComboBoxItem>
+                    <ComboBoxItem Name="sharpen">Sharpen</ComboBoxItem>
+                    <ComboBoxItem Name="edge">Edge Detection</ComboBoxItem>
+                    <ComboBoxItem Name="emboss">Emboss</ComboBoxItem>
+                </ComboBox>
+            </DockPanel>
+            <StackPanel  Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.429,-0.962">
+                <Label>Kernel size</Label>
+            </StackPanel>
+            <DockPanel Grid.Row="3">
+                <TextBox x:Name="KernerSizeTextBox" Text="{Binding ElementName=KernelSizeSlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"
+                         DockPanel.Dock="Right" TextAlignment="Right" Width="20"
+                         VerticalAlignment="Center" Margin="0,0,10,3"/>
+                <Slider x:Name="KernelSizeSlider"  Margin="10,0,10,0" Value="3" VerticalAlignment="Center" 
+                    AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" IsSnapToTickEnabled="True" 
+                    TickFrequency="2" Maximum="9" Minimum="3" TickPlacement="BottomRight" ValueChanged="KernelSizeSlider_ValueChanged"/>
+            </DockPanel>
+            <DockPanel Grid.Row="4" HorizontalAlignment="Center">
+                <TextBlock VerticalAlignment="Center" Width="50">Divisor</TextBlock>
+                <TextBox Name="Divisor" TextAlignment="Right" Width="30"
+                         VerticalAlignment="Center" Margin="0,0,10,0"
+                         PreviewTextInput="TextBefore" TextChanged="TextBoxPasting"/>
+                <Button x:Name="ComputeDivisor" Click="ComputeDivisor_Click" Margin="0,5,5,5">Compute</Button>
+            </DockPanel>
+            <DockPanel Grid.Row="5" HorizontalAlignment="Center">
+                <TextBlock VerticalAlignment="Center" Width="50">Offset</TextBlock>
+                <TextBox x:Name="Offset" TextAlignment="Right" Width="30" Text="1" 
+                         VerticalAlignment="Center" Margin="0,0,10,0"
+                         />
+            </DockPanel>
+            <DockPanel Grid.Row="6" HorizontalAlignment="Center">
+                <TextBlock VerticalAlignment="Center" Width="50">Anchor</TextBlock>
+
+            </DockPanel>
+            <DockPanel Grid.Row="7" HorizontalAlignment="Center">
+                <TextBlock VerticalAlignment="Center">X</TextBlock>
+                <TextBox x:Name="AnchorX" Width="20" Height="20" VerticalAlignment="Center" Margin="10,0,0,0" TextChanged="AnchorX_TextChanged"
+                         Text="1" PreviewTextInput="TextBefore"/>
+                <TextBlock Margin="30,0,0,0" VerticalAlignment="Center">Y</TextBlock>
+                <TextBox  x:Name="AnchorY" Width="20" Height="20" PreviewTextInput="TextBefore" VerticalAlignment="Center" Margin="10,0,0,0" TextChanged="AnchorY_TextChanged">1</TextBox>
+            </DockPanel>
+            <Button x:Name="SaveKernelButton" Grid.Row="8" Margin="10,5,10,5" Click="SaveKernelButton_Click">Save</Button>
+            <Button x:Name="RunKernelButton" Grid.Row="9" Margin="10,5,10,5" Click="RunKernelButton_Click" >Run Kernel</Button>
+        </Grid>
+        <Grid x:Name="GridKernel"  Grid.Row="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+        </Grid>
+    </Grid>
+</Window>
